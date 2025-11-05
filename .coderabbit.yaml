@@ -1,0 +1,142 @@
+language: ko-KR
+
+reviews:
+  profile: chill
+  high_level_summary: true
+  review_status: true
+  request_changes_workflow: false
+  auto_review:
+    enabled: true
+    drafts: true
+    branches:
+      - main
+      - dev
+
+  # 패키지/파일 유형별 맞춤 리뷰 지침
+  path_instructions:
+    - path: "src/main/java/**/apiPayload/**"
+      instructions: |
+        [apiPayload 점검]
+        - 공통 응답 포맷 일관성(ApiResponse/Result/에러코드 체계)과 문서화.
+        - 예외 매핑 정확성(HTTP 상태코드, 에러 메시지/코드 분리, 민감정보 노출 금지).
+        - 메시지 국제화(i18n) 및 클라이언트가 사용하기 쉬운 필드명 유지.
+        - Validation 오류 응답 형식 통일(필드/메시지/코드/리스트 구조).
+
+    - path: "src/main/java/**/config/**"
+      instructions: |
+        [config 점검]
+        - @Configuration/@Enable* 사용 적정성, @ConfigurationProperties 바인딩과 @Validated 검증 적용.
+        - 환경 분리(profile) 및 기본값/비밀키 외부화(.yml, env). 불필요한 하드코딩 금지.
+        - CORS/로그/추적ID(MDC)/Actuator 보안 설정 검토.
+        - 순환 참조/빈 초기화 순서 문제와 조건부 빈(@Conditional) 사용 적절성.
+
+    - path: "src/main/java/**/converter/**"
+      instructions: |
+        [converter 점검]
+        - Null/빈 값 방어코드, 양방향 변환 정확성(단위/타입 스케일 손실 방지).
+        - 중복 매핑 로직 공통화(ModelMapper/MapStruct 등) 및 성능 고려.
+        - 예외 발생 시 의미 있는 예외 계층 사용(IllegalArgumentException 남발 지양).
+
+    - path: "src/main/java/**/domain/**"
+      instructions: |
+        [domain(Entity/도메인) 점검]
+        - JPA 매핑 정확성(연관관계 주인/고아제거/지연로딩), equals/hashCode 구현 주의.
+        - 필수 제약(NOT NULL/Unique/Length/Index)과 낙관적 락(@Version) 고려.
+        - 비즈니스 규칙은 Entity 메서드로 응집, DTO/컨트롤러에 누수 금지.
+        - 컬렉션 초기화/불변성, BigDecimal 스케일/라운딩 처리 점검.
+
+    - path: "src/main/java/**/repository/**"
+      instructions: |
+        [repository 점검]
+        - 쿼리 성능(N+1, 불필요 조인, 페이징 시 count 쿼리)과 인덱스 전략 검토.
+        - 명세/쿼리 메서드 네이밍 가독성, @Query 네이티브 사용 시 타입/매핑 안전성.
+        - 트랜잭션 경계(Service)와의 역할 분리; Repository에서 비즈니스 로직 과다 금지.
+
+    - path: "src/main/java/**/service/**"
+      instructions: |
+        [service 점검]
+        - @Transactional 전파/격리/읽기전용 설정 적절성, 예외 발생 시 롤백 정책 확인.
+        - 입력 검증(@Valid)과 보안 검증(소유권/권한) 처리 위치 명확화.
+        - 도메인 규칙 응집, 중복 로직 유틸/전략 패턴으로 추출. 캐시 도입 여지 검토.
+        - 외부 I/O 재시도/타임아웃/서킷브레이커(Resilience4j) 필요성 점검.
+
+    - path: "src/main/java/**/util/**"
+      instructions: |
+        [util 점검]
+        - 순수 유틸(무상태/부작용 없음) 유지, 로깅/시간/포맷/암복호화 등 공통 모듈화.
+        - 표준 라이브러리/Apache Commons/Guava로 대체 가능한지 검토(재발명 금지).
+        - 정적 유틸 남발 지양, 테스트 용이성 보장.
+
+    - path: "src/main/java/**/web/controller/**"
+      instructions: |
+        [web-controller 점검]
+        - API 규약: HTTP 메서드/리소스 경로 일관성(복수형/버전 prefix), 상태코드 엄격 적용(POST 201+Location, PUT/PATCH 200/204, DELETE 204).
+        - 요청/응답: @RequestBody @Valid 사용, 바인딩/검증 오류는 @ControllerAdvice로 표준화된 에러 포맷 응답.
+        - 보안: 인증/인가(@PreAuthorize/@Secured) 및 입력 화이트리스트(@InitBinder) 적용 여부.
+        - 반환 타입: ResponseEntity로 헤더/상태 명시, 204 응답 시 body 작성/파싱 금지.
+        - 페이징/정렬: Pageable/Sort 기본값, 파라미터 표준화, Page<T> → Response DTO 매핑(총개수/페이지 메타 포함).
+        - 로깅/추적: MDC(traceId) 포함 로깅, PII/민감정보 로그 금지.
+        - 문서화: @Operation/@Parameter 스펙 최신화, OpenAPI와 실제 응답 동기화(예: 204/에러 응답 스키마).
+
+    - path: "src/main/java/**/web/dto/**"
+      instructions: |
+        [web-dto 점검]
+        - 구분: Request/Response DTO 분리, Entity 직접 노출 금지(양방향 연관/지연로딩 이슈 차단).
+        - 검증: jakarta.validation(@NotNull/@Size/@Pattern/@Positive 등) 선언, ValidationGroups로 생성/수정 분리 가능성 검토.
+        - 직렬화: Jackson @JsonProperty/@JsonInclude(NonNull), 날짜/시간 @JsonFormat(ISO-8601), Enum 직렬화 정책 명확화.
+        - 숫자/통화: BigDecimal 스케일/반올림 모드 고정, 소수/정밀도 손실 방지.
+        - 불변성: record 또는 불변 필드 + @Builder(필요 시), toString에서 민감정보 마스킹.
+        - 문서화: @Schema(description, example, requiredMode)로 스키마 명세 충실화, 필드 네이밍 일관성(camelCase).
+        - 매핑: MapStruct/전용 Mapper로 DTO↔Domain 변환 일관화, 중복 매핑 로직 제거.
+
+    # 빌드 스크립트/설정 파일도 점검
+    - path: "build.gradle"
+      instructions: |
+        [Gradle(Groovy) 빌드 스크립트 점검]
+        - 의존성 버전 일관성/중복 제거, BOM 사용 검토.
+        - 빌드 캐시/병렬/Configuration cache 활성화 가능성.
+        - 테스트 태스크 분리, jacoco/spotbugs/spotless 등 품질 플러그인 적용 여부.
+
+    - path: "src/main/resources/application*.yml"
+      instructions: |
+        [애플리케이션 설정 점검]
+        - profile 분리(application-dev/prod.yml)와 민감정보 외부화, 암호화/마스킹 정책.
+        - 로깅 레벨/패턴(MDC traceId), SQL 로그 노출 범위 제한.
+        - CORS/서버 포트/Actuator 보안, SpringDoc/OpenAPI 동기화.
+
+  # 포함/제외 경로 (Java 중심, 핵심 설정 일부 포함)
+  path_filters:
+    # 포함
+    - "**/*.java"
+    - "build.gradle"
+    - "build.gradle.kts"
+    - "settings.gradle"
+    - "settings.gradle.kts"
+    - "pom.xml"
+    - "src/main/resources/application*.yml"
+
+    # 제외(산출물/테스트/IDE 등)
+    - "!**/build/**"
+    - "!**/out/**"
+    - "!**/target/**"
+    - "!.idea/**"
+    - "!.gradle/**"
+    - "!**/*.iml"
+    - "!**/generated/**"
+    - "!src/test/**"
+    - "!src/integrationTest/**"
+    - "!src/androidTest/**"
+    - "!**/*.md"
+    - "!**/*.txt"
+    - "!**/*.png"
+    - "!**/*.jpg"
+    - "!**/*.jpeg"
+    - "!**/*.svg"
+    - "!**/*.webp"
+    - "!**/*.json"
+    - "!**/*.yaml"
+    - "!**/*.yml"
+    - "!src/main/resources/**"          # 기본적으로 리소스 제외…
+    - "!src/main/resources/static/**"   # …단, 위에서 application*.yml 만 별도 포함
+    - "!src/main/resources/public/**"
+    - "!src/main/resources/templates/**"
