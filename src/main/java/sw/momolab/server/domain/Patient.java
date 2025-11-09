@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import sw.momolab.server.domain.common.BaseEntity;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -22,4 +26,9 @@ public class Patient extends BaseEntity {
     @Column(length = 100, nullable = false)
     private String password;
 
+    @Column
+    private LocalDateTime lastLoginAt;
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<Record> recordList = new ArrayList<>();
 }
