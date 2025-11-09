@@ -23,7 +23,7 @@ public class Patient extends BaseEntity {
     @Column(unique = true, length = 50, nullable = false)
     private String loginId;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100)
     private String password;
 
     @Column
@@ -31,4 +31,7 @@ public class Patient extends BaseEntity {
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     private List<Record> recordList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
+    private List<PatientActivation> patientActivationList = new ArrayList<>();
 }
