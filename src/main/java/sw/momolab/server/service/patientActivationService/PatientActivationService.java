@@ -4,5 +4,5 @@ import sw.momolab.server.web.dto.PatientActivationDTO.PatientActivationResponseD
 
 public interface PatientActivationService {
     PatientActivationResponseDTO.CreateActivationResponseDTO createActivation(String loginId);
-    PatientActivationResponseDTO.CompleteActivationResponseDTO completeActivation(String token, String password);
+    void completeActivation(String token, String password);
 }

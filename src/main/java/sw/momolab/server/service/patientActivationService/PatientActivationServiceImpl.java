@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sw.momolab.server.apiPayload.code.status.ErrorStatus;
 import sw.momolab.server.apiPayload.exception.PatientActivationHandler;
 import sw.momolab.server.apiPayload.exception.PatientHandler;
-import sw.momolab.server.converter.PatientActivationConverter;
 import sw.momolab.server.domain.Patient;
 import sw.momolab.server.domain.PatientActivation;
 import sw.momolab.server.repository.PatientActivationRepository;
@@ -68,7 +67,7 @@ public class PatientActivationServiceImpl implements PatientActivationService {
     }
 
     @Override
-    public PatientActivationResponseDTO.CompleteActivationResponseDTO completeActivation(String token, String password) {
+    public void completeActivation(String token, String password) {
         LocalDateTime now = LocalDateTime.now();
 
         String tokenHash = tokenUtil.hashWithPepper(token);
@@ -80,7 +79,5 @@ public class PatientActivationServiceImpl implements PatientActivationService {
 
         patientActivation.updateUsedAt(now);
         patient.updateLastLoginAt(now);
-
-        return PatientActivationConverter.toCompleteActivationDTO(patient, patientActivation);
     }
 }

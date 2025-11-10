@@ -17,10 +17,10 @@ public class PatientActivation extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String tokenHash; // 토큰 해시값
 
-    @Column
+    @Column(nullable = false)
     private LocalDateTime expiresAt; // 토큰 만료 시각
 
     @Column
