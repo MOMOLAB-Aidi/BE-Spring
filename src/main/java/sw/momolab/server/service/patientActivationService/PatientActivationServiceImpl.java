@@ -76,19 +76,11 @@ public class PatientActivationServiceImpl implements PatientActivationService {
                 .orElseThrow(() -> new PatientActivationHandler(ErrorStatus.INVALID_TOKEN));
 
         Patient patient = patientActivation.getPatient();
-
-        validatePassword(password);
         patient.encodePassword(passwordEncoder.encode(password));
 
         patientActivation.updateUsedAt(now);
         patient.updateLastLoginAt(now);
 
         return PatientActivationConverter.toCompleteActivationDTO(patient, patientActivation);
-    }
-
-    private void validatePassword(String password) {
-        if (!password.matches(".*\\d.*")) {
-            throw new PatientHandler(ErrorStatus.PASSWORD_MUST_INCLUDE_NUMBER);
-        }
     }
 }

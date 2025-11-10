@@ -1,10 +1,7 @@
 package sw.momolab.server.web.dto.PatientActivationDTO;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,7 +34,7 @@ public class PatientActivationRequestDTO {
 
         @Schema(description = "비밀번호(숫자 최소 1개 포함, 8~30자)", example = "momo2025")
         @NotBlank(message = "비밀번호는 필수 입력입니다.")
-        @Size(min = 8, max = 30, message = "비밀번호는 8~30자여야 합니다.")
+        @Pattern(regexp = "^(?=.*\\d).{8,30}$", message = "비밀번호는 8~30자이며 숫자를 최소 1개 포함해야 합니다.")
         private String password;
     }
 }
