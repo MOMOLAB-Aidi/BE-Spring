@@ -23,14 +23,14 @@ public class PatientActivationController {
 
     @PostMapping("/activation")
     @Operation(summary = "활성화 URL 발급 API", description = "EMR 측에서 비밀번호를 설정할 수 있는 활성화 URL을 제공합니다.")
-    public PatientActivationResponseDTO.CreateActivationResponseDTO create(@Valid @RequestBody PatientActivationRequestDTO.CreateActivationRequestDTO request) {
+    public PatientActivationResponseDTO.CreateActivationResponseDTO createActivation(@Valid @RequestBody PatientActivationRequestDTO.CreateActivationRequestDTO request) {
 
         return patientActivationService.createActivation(request.getLoginId());
     }
 
     @PostMapping("/activation/complete")
     @Operation(summary = "초기 비밀번호 설정 API", description = "토큰값을 사용하여 환자의 초기 비밀번호를 설정합니다.")
-    public PatientActivationResponseDTO.CompleteActivationResponseDTO complete(@Valid @RequestBody PatientActivationRequestDTO.CompleteActivationRequestDTO request) {
+    public PatientActivationResponseDTO.CompleteActivationResponseDTO completeActivation(@Valid @RequestBody PatientActivationRequestDTO.CompleteActivationRequestDTO request) {
 
         return patientActivationService.completeActivation(request.getToken(), request.getPassword());
     }

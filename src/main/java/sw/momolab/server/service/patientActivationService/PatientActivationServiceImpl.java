@@ -43,7 +43,7 @@ public class PatientActivationServiceImpl implements PatientActivationService {
 
         // 환자당 유효 토큰 1개로 제한
         if (activationRepository.countActiveByPatient(patient.getId(), now) > 0) {
-            throw new PatientActivationHandler(ErrorStatus.VALID_TOKEN_ALREADY_EXISTS);
+            throw new PatientActivationHandler(ErrorStatus.VALID_TOKEN_EXISTS);
         }
 
         String token = tokenUtil.generateUrlSafeToken(48); // 환자에게 전달할 평문

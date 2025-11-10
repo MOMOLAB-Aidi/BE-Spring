@@ -19,9 +19,7 @@ public enum ErrorStatus implements BaseErrorCode {
     PATIENT_NOT_FOUND(HttpStatus.NOT_FOUND, "PATIENT_404_01", "환자를 찾을 수 없습니다."),
 
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "PATIENT_ACTIVATION_401_01", "유효하지 않거나 만료된 토큰입니다."),
-    VALID_TOKEN_ALREADY_EXISTS(HttpStatus.CONFLICT, "PATIENT_ACTIVATION_409_01", "유효한 토큰이 이미 존재합니다."),
-
-    PASSWORD_MUST_INCLUDE_NUMBER(HttpStatus.BAD_REQUEST, "PATIENT_404_02", "비밀번호에는 최소 한 개의 숫자가 포함되어야 합니다."),
+    VALID_TOKEN_EXISTS(HttpStatus.CONFLICT, "PATIENT_ACTIVATION_409_01", "유효한 토큰이 존재합니다."),
 
     ;
 
