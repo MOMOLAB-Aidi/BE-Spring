@@ -1,0 +1,10 @@
+.git
+.gitignore
+**/.idea
+**/.vscode
+**/target
+**/build
+**/.gradle
+**/node_modules
+*.iml
+*.log
