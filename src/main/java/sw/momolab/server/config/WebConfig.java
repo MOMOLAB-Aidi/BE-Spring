@@ -23,10 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
 
         if (!allowedOrigins.isEmpty()) {
             // 허용할 origin
-            config.setAllowedOriginPatterns(List.of(
-                    "http://localhost:8080",
-                    "https://momolab-spring-704930097925.asia-northeast3.run.app"
-            ));
+            config.setAllowedOriginPatterns(List.of(allowedOrigins.split(",")));
 
             // 허용할 HTTP 메서드
             config.setAllowedMethods(List.of(
