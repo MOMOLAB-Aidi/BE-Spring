@@ -34,4 +34,12 @@ public class Patient extends BaseEntity {
 
     @OneToMany(mappedBy = "patient", cascade = CascadeType.ALL)
     private List<PatientActivation> patientActivationList = new ArrayList<>();
+
+    public void encodePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateLastLoginAt(LocalDateTime now) {
+        this.lastLoginAt = now;
+    }
 }
