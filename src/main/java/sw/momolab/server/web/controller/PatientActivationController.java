@@ -29,7 +29,7 @@ public class PatientActivationController {
     }
 
     @PostMapping("/activation/complete")
-    @Operation(summary = "비밀번호 설정 API", description = "토큰값을 사용하여 환자의 비밀번호를 설정합니다.")
+    @Operation(summary = "초기 비밀번호 설정 API", description = "토큰값을 사용하여 환자의 초기 비밀번호를 설정합니다.")
     public PatientActivationResponseDTO.CompleteActivationResponseDTO complete(@Valid @RequestBody PatientActivationRequestDTO.CompleteActivationRequestDTO request) {
 
         return patientActivationService.completeActivation(request.getToken(), request.getPassword());
