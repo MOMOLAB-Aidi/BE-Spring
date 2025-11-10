@@ -1,17 +1,21 @@
 package sw.momolab.server.apiPayload.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import sw.momolab.server.apiPayload.ApiResponse;
+import sw.momolab.server.apiPayload.code.ErrorReasonDTO;
 import sw.momolab.server.apiPayload.code.status.ErrorStatus;
 
 import java.util.LinkedHashMap;
@@ -47,6 +51,47 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
         return handleExceptionInternalArgs(e,HttpHeaders.EMPTY,ErrorStatus.valueOf("_BAD_REQUEST"),request,errors);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<Object> exception(Exception e, WebRequest request) {
+        log.error("Unhandled exception occurred", e);
+        return handleExceptionWithErrorPoint(e, ErrorStatus._INTERNAL_SERVER_ERROR, HttpHeaders.EMPTY, ErrorStatus._INTERNAL_SERVER_ERROR.getHttpStatus(),request, null);
+    }
+
+    @ExceptionHandler(value = GeneralException.class)
+    public ResponseEntity<Object> onThrowException(GeneralException generalException, HttpServletRequest request) {
+        log.warn("Business exception occurred: {}", generalException.getErrorReasonHttpStatus().getMessage());
+
+        ErrorReasonDTO errorReasonHttpStatus = generalException.getErrorReasonHttpStatus();
+        return handleGeneralException(generalException,errorReasonHttpStatus,HttpHeaders.EMPTY, request);
+    }
+
+    private ResponseEntity<Object> handleGeneralException(Exception e, ErrorReasonDTO reason,
+                                                           HttpHeaders headers, HttpServletRequest request) {
+
+        ApiResponse<Object> body = ApiResponse.onFailure(reason.getCode(),reason.getMessage(),null);
+
+        WebRequest webRequest = new ServletWebRequest(request);
+        return super.handleExceptionInternal(
+                e,
+                body,
+                headers != null ? headers : HttpHeaders.EMPTY,
+                reason.getHttpStatus(),
+                webRequest
+        );
+    }
+
+    private ResponseEntity<Object> handleExceptionWithErrorPoint(Exception e, ErrorStatus errorCommonStatus,
+                                                                HttpHeaders headers, HttpStatus status, WebRequest request, String errorPoint) {
+        ApiResponse<Object> body = ApiResponse.onFailure(errorCommonStatus.getCode(),errorCommonStatus.getMessage(),errorPoint);
+        return super.handleExceptionInternal(
+                e,
+                body,
+                headers,
+                status,
+                request
+        );
+    }
+
     private ResponseEntity<Object> handleExceptionInternalArgs(Exception e, HttpHeaders headers, ErrorStatus errorCommonStatus,
                                                                WebRequest request, Map<String, String> errorArgs) {
         ApiResponse<Object> body = ApiResponse.onFailure(errorCommonStatus.getCode(),errorCommonStatus.getMessage(),errorArgs);
@@ -70,5 +115,4 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
                 request
         );
     }
-
 }
