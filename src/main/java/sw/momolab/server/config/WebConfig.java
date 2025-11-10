@@ -8,6 +8,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -23,7 +24,12 @@ public class WebConfig implements WebMvcConfigurer {
 
         if (!allowedOrigins.isEmpty()) {
             // 허용할 origin
-            config.setAllowedOriginPatterns(List.of(allowedOrigins.split(",")));
+            config.setAllowedOriginPatterns(
+                    Arrays.stream(allowedOrigins.split(","))
+                            .map(String::trim)
+                            .filter(s -> !s.isEmpty())
+                            .toList()
+            );
 
             // 허용할 HTTP 메서드
             config.setAllowedMethods(List.of(
