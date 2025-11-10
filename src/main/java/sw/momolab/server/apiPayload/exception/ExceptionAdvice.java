@@ -53,18 +53,19 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<Object> exception(Exception e, WebRequest request) {
-
-        return handleExceptionInternalFalse(e, ErrorStatus._INTERNAL_SERVER_ERROR, HttpHeaders.EMPTY, ErrorStatus._INTERNAL_SERVER_ERROR.getHttpStatus(),request, e.getMessage());
+        log.error("Unhandled exception occurred", e);
+        return handleExceptionWithErrorPoint(e, ErrorStatus._INTERNAL_SERVER_ERROR, HttpHeaders.EMPTY, ErrorStatus._INTERNAL_SERVER_ERROR.getHttpStatus(),request, null);
     }
 
     @ExceptionHandler(value = GeneralException.class)
-    public ResponseEntity onThrowException(GeneralException generalException, HttpServletRequest request) {
-        ErrorReasonDTO errorReasonHttpStatus = generalException.getErrorReasonHttpStatus();
+    public ResponseEntity<Object> onThrowException(GeneralException generalException, HttpServletRequest request) {
+        log.warn("Business exception occurred: {}", generalException.getErrorReasonHttpStatus().getMessage());
 
-        return handleExceptionInternal(generalException,errorReasonHttpStatus,null,request);
+        ErrorReasonDTO errorReasonHttpStatus = generalException.getErrorReasonHttpStatus();
+        return handleGeneralException(generalException,errorReasonHttpStatus,HttpHeaders.EMPTY, request);
     }
 
-    private ResponseEntity<Object> handleExceptionInternal(Exception e, ErrorReasonDTO reason,
+    private ResponseEntity<Object> handleGeneralException(Exception e, ErrorReasonDTO reason,
                                                            HttpHeaders headers, HttpServletRequest request) {
 
         ApiResponse<Object> body = ApiResponse.onFailure(reason.getCode(),reason.getMessage(),null);
@@ -73,13 +74,13 @@ public class ExceptionAdvice extends ResponseEntityExceptionHandler {
         return super.handleExceptionInternal(
                 e,
                 body,
-                headers,
+                headers != null ? headers : HttpHeaders.EMPTY,
                 reason.getHttpStatus(),
                 webRequest
         );
     }
 
-    private ResponseEntity<Object> handleExceptionInternalFalse(Exception e, ErrorStatus errorCommonStatus,
+    private ResponseEntity<Object> handleExceptionWithErrorPoint(Exception e, ErrorStatus errorCommonStatus,
                                                                 HttpHeaders headers, HttpStatus status, WebRequest request, String errorPoint) {
         ApiResponse<Object> body = ApiResponse.onFailure(errorCommonStatus.getCode(),errorCommonStatus.getMessage(),errorPoint);
         return super.handleExceptionInternal(

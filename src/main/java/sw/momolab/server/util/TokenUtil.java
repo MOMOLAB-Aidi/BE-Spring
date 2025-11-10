@@ -30,9 +30,5 @@ public class TokenUtil {
         md.update(token.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(md.digest());
     }
-
-    public boolean constantTimeEquals(String a, String b) {
-        return MessageDigest.isEqual(a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
-    }
 }
 
