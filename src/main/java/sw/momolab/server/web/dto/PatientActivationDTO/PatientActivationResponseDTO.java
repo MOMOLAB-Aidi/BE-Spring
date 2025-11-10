@@ -30,7 +30,7 @@ public class PatientActivationResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(title = "환자 비밀번호 설정 요청 응답")
+    @Schema(title = "환자 활성화 완료(비밀번호 설정) 응답")
     public static class CompleteActivationResponseDTO {
         @Schema(description = "환자의 로그인 ID", example = "P12345678")
         private String loginId;

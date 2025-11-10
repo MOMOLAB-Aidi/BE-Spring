@@ -5,6 +5,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sw.momolab.server.apiPayload.code.status.ErrorStatus;
+import sw.momolab.server.apiPayload.exception.PatientActivationHandler;
+import sw.momolab.server.apiPayload.exception.PatientHandler;
 import sw.momolab.server.domain.Patient;
 import sw.momolab.server.domain.PatientActivation;
 import sw.momolab.server.repository.PatientActivationRepository;
@@ -35,11 +38,11 @@ public class PatientActivationServiceImpl implements PatientActivationService {
         LocalDateTime now = LocalDateTime.now();
 
         Patient patient = patientRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new IllegalArgumentException("환자를 찾을 수 없습니다."));
+                .orElseThrow(() -> new PatientHandler(ErrorStatus.PATIENT_NOT_FOUND));
 
         // 환자당 유효 토큰 1개로 제한
         if (activationRepository.countActiveByPatient(patient.getId(), now) > 0) {
-            throw new IllegalStateException("유효한 토큰이 이미 존재합니다.");
+            throw new PatientActivationHandler(ErrorStatus.VALID_TOKEN_ALREADY_EXISTS);
         }
 
         String token = tokenUtil.generateUrlSafeToken(48); // 환자에게 전달할 평문
@@ -68,31 +71,28 @@ public class PatientActivationServiceImpl implements PatientActivationService {
         LocalDateTime now = LocalDateTime.now();
 
         String tokenHash = tokenUtil.hashWithPepper(token);
-        PatientActivation pa = activationRepository.findValidByHash(tokenHash, now)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지 않거나 만료된 토큰입니다."));
+        PatientActivation patientActivation = activationRepository.findValidByHash(tokenHash, now)
+                .orElseThrow(() -> new PatientActivationHandler(ErrorStatus.INVALID_TOKEN));
 
-        Patient p = pa.getPatient();
+        Patient patient = patientActivation.getPatient();
 
         validatePassword(password);
-        p.encodePassword(passwordEncoder.encode(password));
+        patient.encodePassword(passwordEncoder.encode(password));
 
-        pa.updateUsedAt(now);
-        p.updateLastLoginAt(now);
+        patientActivation.updateUsedAt(now);
+        patient.updateLastLoginAt(now);
 
         return PatientActivationResponseDTO.CompleteActivationResponseDTO.builder()
-                .loginId(p.getLoginId())
-                .password(p.getPassword())
-                .usedAt(pa.getUsedAt())
-                .lastLoginAt(p.getLastLoginAt())
+                .loginId(patient.getLoginId())
+                .password(patient.getPassword())
+                .usedAt(patientActivation.getUsedAt())
+                .lastLoginAt(patient.getLastLoginAt())
                 .build();
     }
 
-    private void validatePassword(String pw) {
-        if (pw == null || pw.length() < 8 || pw.length() > 30) {
-            throw new IllegalArgumentException("비밀번호는 8~30자여야 합니다.");
-        }
-        if (!pw.matches(".*\\d.*")) {
-            throw new IllegalArgumentException("비밀번호에는 최소 한 개의 숫자가 포함되어야 합니다.");
+    private void validatePassword(String password) {
+        if (!password.matches(".*\\d.*")) {
+            throw new PatientHandler(ErrorStatus.PASSWORD_MUST_INCLUDE_NUMBER);
         }
     }
 }
