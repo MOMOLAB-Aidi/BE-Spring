@@ -41,9 +41,10 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         String loginId = request.getLoginId();
         String password = request.getPassword();
 
+        // 로그인에 실패하면 "아이디 또는 비밀번호가 일치하지 않습니다." 출력
         try {
             User user = userRepository.findByLoginId(loginId)
-                    .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND)); // 아이디가 존재하지 않는 경우 "사용자를 찾을 수 없습니다." 출력
+                    .orElseThrow(() -> new AuthHandler(ErrorStatus.INVALID_CREDENTIALS));
 
             // 인증 수행 및 토큰 생성 및 저장
             TokenResponseDTO.TokenDTO tokenDTO = performAuthentication(loginId, password);
@@ -52,7 +53,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
             return AuthConverter.toLoginResponseDTO(tokenDTO);
         } catch (UsernameNotFoundException | BadCredentialsException e) {
-            throw new AuthHandler(ErrorStatus.INVALID_CREDENTIALS); // 비밀번호가 틀린 경우 보안 강화?를 위해 "아이디 또는 비밀번호가 일치하지 않습니다." 출력
+            throw new AuthHandler(ErrorStatus.INVALID_CREDENTIALS);
         }
     }
 

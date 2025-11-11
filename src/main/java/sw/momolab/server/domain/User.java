@@ -44,7 +44,6 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @Builder.Default
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private RefreshToken refreshToken;
 

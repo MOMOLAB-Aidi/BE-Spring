@@ -8,6 +8,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import sw.momolab.server.apiPayload.code.status.ErrorStatus;
+import sw.momolab.server.apiPayload.exception.AuthHandler;
 import sw.momolab.server.converter.TokenConverter;
 import sw.momolab.server.domain.CustomUserDetails;
 import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
@@ -27,6 +29,12 @@ public class JwtTokenUtil {
 
     public JwtTokenUtil(@Value("${jwt.secretKey}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+
+        // 키 길이 검증
+        if (keyBytes.length < 32) {
+            throw new AuthHandler(ErrorStatus.SECRET_KEY_TOO_SHORT);
+        }
+
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -62,21 +70,18 @@ public class JwtTokenUtil {
 
         // rt 생성
         return Jwts.builder()
+                .subject(customUserDetails.getUsername())
                 .expiration(new Date(now + REFRESH_TOKEN_EXPIRATION_MS))
                 .signWith(key)
                 .compact();
     }
 
-    // jwt 토큰에서 클레임 추출
+    // jwt 토큰에서 클레임 추출, 만료된 토큰에 대해서는 예외를 그대로 전파
     public Claims parseClaims(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
