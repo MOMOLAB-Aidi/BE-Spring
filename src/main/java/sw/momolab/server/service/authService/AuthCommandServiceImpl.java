@@ -1,0 +1,77 @@
+package sw.momolab.server.service.authService;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import sw.momolab.server.apiPayload.code.status.ErrorStatus;
+import sw.momolab.server.apiPayload.exception.AuthHandler;
+import sw.momolab.server.apiPayload.exception.UserHandler;
+import sw.momolab.server.converter.AuthConverter;
+import sw.momolab.server.domain.CustomUserDetails;
+import sw.momolab.server.domain.RefreshToken;
+import sw.momolab.server.domain.User;
+import sw.momolab.server.repository.UserRepository;
+import sw.momolab.server.service.refreshTokenService.RefreshTokenCommandService;
+import sw.momolab.server.util.JwtTokenUtil;
+import sw.momolab.server.web.dto.AuthDTO.AuthRequestDTO;
+import sw.momolab.server.web.dto.AuthDTO.AuthResponseDTO;
+import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
+
+import java.time.LocalDateTime;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class AuthCommandServiceImpl implements AuthCommandService {
+
+    private final UserRepository userRepository;
+
+    private final RefreshTokenCommandService refreshTokenCommandService;
+
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AuthenticationManager authenticationManager;
+
+    @Override
+    public AuthResponseDTO.LoginResponseDTO login(AuthRequestDTO.LoginRequestDTO request) {
+        String loginId = request.getLoginId();
+        String password = request.getPassword();
+
+        try {
+            User user = userRepository.findByLoginId(loginId)
+                    .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND)); // 아이디가 존재하지 않는 경우 "사용자를 찾을 수 없습니다." 출력
+
+            // 인증 수행 및 토큰 생성 및 저장
+            TokenResponseDTO.TokenDTO tokenDTO = performAuthentication(loginId, password);
+            setRefreshToken(tokenDTO.getRefreshToken(), user);
+            user.updateLastLoginAt(LocalDateTime.now());
+
+            return AuthConverter.toLoginResponseDTO(tokenDTO);
+        } catch (UsernameNotFoundException | BadCredentialsException e) {
+            throw new AuthHandler(ErrorStatus.INVALID_CREDENTIALS); // 비밀번호가 틀린 경우 보안 강화?를 위해 "아이디 또는 비밀번호가 일치하지 않습니다." 출력
+        }
+    }
+
+    @Override
+    public void setRefreshToken(String refreshToken, User patient) {
+        RefreshToken refreshTokenEntity = refreshTokenCommandService.createRefreshToken(refreshToken, patient);
+        patient.setRefreshToken(refreshTokenEntity);
+    }
+
+    @Override
+    public TokenResponseDTO.TokenDTO performAuthentication(String loginId, String password) {
+        //인증되지 않은 상태의 Authentication 객체 생성
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(loginId, password);
+
+        //인증 성공 시 인증된 상태의 Authentication 객체 반환, 인증 실패 시 예외 던짐
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
+
+        //인증 성공 시 JWT 토큰 생성
+        return jwtTokenUtil.generateToken((CustomUserDetails) authentication.getPrincipal());
+    }
+}

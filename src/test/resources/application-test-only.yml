@@ -1,0 +1,7 @@
+# DB 연결 시도를 막고, PasswordEncoder Bean만 로드하도록 설정
+spring:
+  # 데이터소스를 사용하지 않도록 명시적으로 설정
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration
