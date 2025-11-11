@@ -20,6 +20,7 @@ public enum ErrorStatus implements BaseErrorCode {
     TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "AUTH_401_02", "만료된 JWT 토큰입니다."),
     TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "AUTH_401_03", "유효하지 않은 JWT 서명 또는 형식입니다."),
     TOKEN_GENERAL_ERROR(HttpStatus.UNAUTHORIZED, "AUTH_401_04", "기타 토큰 인증 오류입니다."),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH_401_05", "인증 정보가 필요합니다."),
 
     ;
 
