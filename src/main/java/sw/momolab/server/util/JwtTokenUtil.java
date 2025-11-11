@@ -32,7 +32,7 @@ public class JwtTokenUtil {
 
         // 키 길이 검증
         if (keyBytes.length < 32) {
-            throw new AuthHandler(ErrorStatus.SECRET_KEY_TOO_SHORT);
+            throw new IllegalArgumentException("JWT secret key는 최소 256비트여야 합니다.");
         }
 
         this.key = Keys.hmacShaKeyFor(keyBytes);
