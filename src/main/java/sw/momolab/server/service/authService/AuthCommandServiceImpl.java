@@ -14,8 +14,8 @@ import sw.momolab.server.domain.CustomUserDetails;
 import sw.momolab.server.domain.RefreshToken;
 import sw.momolab.server.domain.User;
 import sw.momolab.server.repository.UserRepository;
-import sw.momolab.server.service.refreshTokenService.RefreshTokenCommandService;
-import sw.momolab.server.util.JwtTokenUtil;
+import sw.momolab.server.service.tokenService.JwtTokenService;
+import sw.momolab.server.service.tokenService.RefreshTokenCommandService;
 import sw.momolab.server.web.dto.AuthDTO.AuthRequestDTO;
 import sw.momolab.server.web.dto.AuthDTO.AuthResponseDTO;
 import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
@@ -30,7 +30,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
     private final RefreshTokenCommandService refreshTokenCommandService;
 
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenService jwtTokenService;
     private final AuthenticationManager authenticationManager;
 
     @Override
@@ -74,6 +74,6 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         //인증 성공 시 JWT 토큰 생성
-        return jwtTokenUtil.generateToken((CustomUserDetails) authentication.getPrincipal());
+        return jwtTokenService.generateToken((CustomUserDetails) authentication.getPrincipal());
     }
 }

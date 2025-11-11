@@ -1,4 +1,4 @@
-package sw.momolab.server.service.refreshTokenService;
+package sw.momolab.server.service.tokenService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -6,7 +6,6 @@ import sw.momolab.server.converter.TokenConverter;
 import sw.momolab.server.domain.RefreshToken;
 import sw.momolab.server.domain.User;
 import sw.momolab.server.repository.RefreshTokenRepository;
-import sw.momolab.server.util.JwtTokenUtil;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -17,11 +16,11 @@ import java.util.Date;
 public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandService {
 
     private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenService jwtTokenService;
 
     @Override
     public RefreshToken createRefreshToken(String refreshToken, User user) {
-        Date expiryDate = jwtTokenUtil.parseClaims(refreshToken).getExpiration();
+        Date expiryDate = jwtTokenService.parseClaims(refreshToken).getExpiration();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault());
 
         RefreshToken refreshTokenEntity = TokenConverter.toRefreshTokenResponseDTO(refreshToken, localDateTime, user);
