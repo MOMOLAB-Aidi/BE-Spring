@@ -27,13 +27,16 @@ public class JwtTokenUtil {
 
     public JwtTokenUtil(Environment env) {
 
-        // Environment를 사용하여 프로퍼티 값을 읽어옴.
-        String secretKey = env.getRequiredProperty("jwt.secretKey");
-        this.ACCESS_TOKEN_EXPIRATION_MS = env.getRequiredProperty("jwt.access-token-expiration-ms", Long.class);
-        this.REFRESH_TOKEN_EXPIRATION_MS = env.getRequiredProperty("jwt.refresh-token-expiration-ms", Long.class);
+        // Environment를 사용하여 프로퍼티 값을 읽어옴
+        String secretKey = env.getRequiredProperty("JWT_SECRET_KEY");
+        this.ACCESS_TOKEN_EXPIRATION_MS = env.getRequiredProperty("JWT_ACCESS_TOKEN_EXPIRATION_MS", Long.class);
+        this.REFRESH_TOKEN_EXPIRATION_MS = env.getRequiredProperty("JWT_REFRESH_TOKEN_EXPIRATION_MS", Long.class);
 
-        // 키 길이 초기화
+        // 키 길이 검증 및 초기화
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        if (keyBytes.length < 32) {
+            throw new IllegalArgumentException("JWT secret key는 최소 256비트여야 합니다.");
+        }
 
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
