@@ -6,6 +6,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 import sw.momolab.server.apiPayload.code.status.ErrorStatus;
@@ -24,14 +25,17 @@ public class JwtTokenUtil {
     private final long ACCESS_TOKEN_EXPIRATION_MS;
     private final long REFRESH_TOKEN_EXPIRATION_MS;
 
-    public JwtTokenUtil(@Value("${jwt.secretKey}") String secretKey,
-                        @Value("${jwt.access-token-expiration-ms}") long accessTokenExpirationMs,
-                        @Value("${jwt.refresh-token-expiration-ms}") long refreshTokenExpirationMs) {
+    public JwtTokenUtil(Environment env) {
+
+        // Environment를 사용하여 프로퍼티 값을 읽어옴.
+        String secretKey = env.getRequiredProperty("jwt.secretKey");
+        this.ACCESS_TOKEN_EXPIRATION_MS = env.getRequiredProperty("jwt.access-token-expiration-ms", Long.class);
+        this.REFRESH_TOKEN_EXPIRATION_MS = env.getRequiredProperty("jwt.refresh-token-expiration-ms", Long.class);
+
+        // 키 길이 초기화
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 
         this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.ACCESS_TOKEN_EXPIRATION_MS = accessTokenExpirationMs;
-        this.REFRESH_TOKEN_EXPIRATION_MS = refreshTokenExpirationMs;
     }
 
     // at, rt 발급
