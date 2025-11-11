@@ -1,6 +1,7 @@
 package sw.momolab.server.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -8,44 +9,49 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
+@EnableConfigurationProperties(CorsProperties.class)
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${cors.allowed-origins}")
-    private String allowedOrigins;
+    private final CorsProperties corsProperties;
+
+    public WebConfig(CorsProperties corsProperties) {
+        this.corsProperties = corsProperties;
+    }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        if (!allowedOrigins.isEmpty()) {
-            // 허용할 origin
-            config.setAllowedOriginPatterns(List.of(
-                    "http://localhost:8080"
-            ));
+        // CorsProperties에서 허용 origin 문자열 가져오기
+        String allowed = corsProperties.allowedOrigins();
 
-            // 허용할 HTTP 메서드
-            config.setAllowedMethods(List.of(
-                    "POST",
-                    "GET",
-                    "PATCH",
-                    "DELETE"
-            ));
+        if (allowed != null && !allowed.isBlank()) {
+            var patterns = Arrays.stream(allowed.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isBlank())
+                    .toList();
 
-            // 허용할 헤더
-            config.setAllowedHeaders(List.of(
-                    "Authorization",
-                    "Content-Type"
-            ));
+            if (!patterns.isEmpty()) {
+                // 허용할 origin 패턴
+                config.setAllowedOriginPatterns(patterns);
 
-            // 인증 정보 허용
-            config.setAllowCredentials(true);
+                // 허용할 HTTP 메서드
+                config.setAllowedMethods(List.of("POST", "GET", "PATCH", "DELETE"));
 
-            // 모든 경로에 적용
-            source.registerCorsConfiguration("/**", config);
+                // 허용할 헤더
+                config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
+                // 인증 정보 허용
+                config.setAllowCredentials(true);
+
+                // 모든 경로에 적용
+                source.registerCorsConfiguration("/**", config);
+            }
         }
 
         return source;
