@@ -29,11 +29,6 @@ public class JwtTokenUtil {
                         @Value("${jwt.refresh-token-expiration-ms}") long refreshTokenExpirationMs) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 
-        // 키 길이 검증
-        if (keyBytes.length < 32) {
-            throw new IllegalArgumentException("JWT secret key는 최소 256비트여야 합니다.");
-        }
-
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.ACCESS_TOKEN_EXPIRATION_MS = accessTokenExpirationMs;
         this.REFRESH_TOKEN_EXPIRATION_MS = refreshTokenExpirationMs;
