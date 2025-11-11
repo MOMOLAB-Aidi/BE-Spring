@@ -1,16 +1,12 @@
-package sw.momolab.server.util;
+package sw.momolab.server.service.tokenService;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-import sw.momolab.server.apiPayload.code.status.ErrorStatus;
-import sw.momolab.server.apiPayload.exception.AuthHandler;
 import sw.momolab.server.converter.TokenConverter;
 import sw.momolab.server.domain.CustomUserDetails;
 import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
@@ -20,12 +16,12 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @Component
-public class JwtTokenUtil {
+public class JwtTokenService {
     private final SecretKey key;
     private final long ACCESS_TOKEN_EXPIRATION_MS;
     private final long REFRESH_TOKEN_EXPIRATION_MS;
 
-    public JwtTokenUtil(Environment env) {
+    public JwtTokenService(Environment env) {
 
         // Environment를 사용하여 프로퍼티 값을 읽어옴
         String secretKey = env.getRequiredProperty("JWT_SECRET_KEY");
