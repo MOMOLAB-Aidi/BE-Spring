@@ -21,13 +21,12 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenUtil {
     private final SecretKey key;
+    private final long ACCESS_TOKEN_EXPIRATION_MS;
+    private final long REFRESH_TOKEN_EXPIRATION_MS;
 
-    @Value("${jwt.access-token-expiration-ms}")
-    private long ACCESS_TOKEN_EXPIRATION_MS;
-    @Value("${jwt.refresh-token-expiration-ms}")
-    private long REFRESH_TOKEN_EXPIRATION_MS;
-
-    public JwtTokenUtil(@Value("${jwt.secretKey}") String secretKey) {
+    public JwtTokenUtil(@Value("${jwt.secretKey}") String secretKey,
+                        @Value("${jwt.access-token-expiration-ms}") long accessTokenExpirationMs,
+                        @Value("${jwt.refresh-token-expiration-ms}") long refreshTokenExpirationMs) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
 
         // 키 길이 검증
@@ -36,6 +35,8 @@ public class JwtTokenUtil {
         }
 
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        this.ACCESS_TOKEN_EXPIRATION_MS = accessTokenExpirationMs;
+        this.REFRESH_TOKEN_EXPIRATION_MS = refreshTokenExpirationMs;
     }
 
     // at, rt 발급

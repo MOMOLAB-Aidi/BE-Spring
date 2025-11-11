@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sw.momolab.server.apiPayload.code.status.ErrorStatus;
+import sw.momolab.server.apiPayload.exception.AuthHandler;
 import sw.momolab.server.apiPayload.exception.UserHandler;
 import sw.momolab.server.domain.CustomUserDetails;
 import sw.momolab.server.domain.User;
@@ -25,7 +26,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
 
         User user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new UsernameNotFoundException(ErrorStatus.USER_NOT_FOUND.getMessage()));
+                .orElseThrow(() -> new AuthHandler(ErrorStatus.INVALID_CREDENTIALS));
 
         return new CustomUserDetails(
                 user.getLoginId(),
