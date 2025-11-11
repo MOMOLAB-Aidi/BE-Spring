@@ -69,6 +69,7 @@ public class Record extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "record", cascade = CascadeType.ALL)
     private List<RecordExchange> recordExchangeList = new ArrayList<>();
 }

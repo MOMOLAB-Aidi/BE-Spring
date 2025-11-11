@@ -3,7 +3,6 @@ package sw.momolab.server.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,13 +12,13 @@ import sw.momolab.server.converter.TokenConverter;
 import sw.momolab.server.domain.CustomUserDetails;
 import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenUtil {
-    private final Key key;
+    private final SecretKey key;
 
     @Value("${jwt.access-token-expiration-ms}")
     private long ACCESS_TOKEN_EXPIRATION_MS;
@@ -50,11 +49,11 @@ public class JwtTokenUtil {
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRATION_MS);
 
         return Jwts.builder()
-                .setSubject(customUserDetails.getUsername())
+                .subject(customUserDetails.getUsername())
                 .claim("roles", authorities)
                 .claim("userId", customUserDetails.getId())
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS256)
+                .expiration(accessTokenExpiresIn)
+                .signWith(key)
                 .compact();
     }
 
@@ -63,19 +62,19 @@ public class JwtTokenUtil {
 
         // rt 생성
         return Jwts.builder()
-                .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRATION_MS))
-                .signWith(key, SignatureAlgorithm.HS256)
+                .expiration(new Date(now + REFRESH_TOKEN_EXPIRATION_MS))
+                .signWith(key)
                 .compact();
     }
 
     // jwt 토큰에서 클레임 추출
     public Claims parseClaims(String token) {
         try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
+            return Jwts.parser()
+                    .verifyWith(key)
                     .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }

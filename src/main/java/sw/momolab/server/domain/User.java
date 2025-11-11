@@ -44,9 +44,11 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserRole role;
 
+    @Builder.Default
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private RefreshToken refreshToken;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Record> recordList = new ArrayList<>();
 

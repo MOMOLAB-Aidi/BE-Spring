@@ -25,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public CustomUserDetails loadUserByUsername(String loginId) throws UsernameNotFoundException {
 
         User user = userRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new UsernameNotFoundException(ErrorStatus.USER_NOT_FOUND.getMessage()));
 
         return new CustomUserDetails(
                 user.getLoginId(),

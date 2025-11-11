@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import sw.momolab.server.domain.common.BaseEntity;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
 @Table(name = "record_exchange")
@@ -36,7 +37,7 @@ public class RecordExchange extends BaseEntity {
 
     // 주입액 농도
     @Column(nullable = false)
-    private Float fillConcentration;
+    private BigDecimal fillConcentration;
 
     // 제수량
     @Column(nullable = false)

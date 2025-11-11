@@ -20,6 +20,7 @@ public class AuthRequestDTO {
         private String loginId;
 
         @Schema(description = "로그인할 계정의 비밀번호", example = "aidi2025")
+        @NotBlank(message = "필수 입력 항목입니다.")
         private String password;
     }
 }
