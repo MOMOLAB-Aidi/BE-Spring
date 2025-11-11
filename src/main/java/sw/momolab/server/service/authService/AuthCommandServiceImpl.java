@@ -5,12 +5,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sw.momolab.server.apiPayload.code.status.ErrorStatus;
 import sw.momolab.server.apiPayload.exception.AuthHandler;
-import sw.momolab.server.apiPayload.exception.UserHandler;
 import sw.momolab.server.converter.AuthConverter;
 import sw.momolab.server.domain.CustomUserDetails;
 import sw.momolab.server.domain.RefreshToken;
@@ -26,7 +24,6 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class AuthCommandServiceImpl implements AuthCommandService {
 
     private final UserRepository userRepository;
@@ -37,22 +34,26 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     private final AuthenticationManager authenticationManager;
 
     @Override
+    @Transactional
     public AuthResponseDTO.LoginResponseDTO login(AuthRequestDTO.LoginRequestDTO request) {
         String loginId = request.getLoginId();
         String password = request.getPassword();
 
-        // 로그인에 실패하면 "아이디 또는 비밀번호가 일치하지 않습니다." 출력
-        try {
-            User user = userRepository.findByLoginId(loginId)
-                    .orElseThrow(() -> new AuthHandler(ErrorStatus.INVALID_CREDENTIALS));
+        // 사용자가 존재하지 않는 경우
+        User user = userRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new AuthHandler(ErrorStatus.INVALID_CREDENTIALS));
 
-            // 인증 수행 및 토큰 생성 및 저장
+
+        try {
+            // 인증 수행 (비밀번호 검증)
             TokenResponseDTO.TokenDTO tokenDTO = performAuthentication(loginId, password);
+
+            // 인증 성공 후 로직
             setRefreshToken(tokenDTO.getRefreshToken(), user);
             user.updateLastLoginAt(LocalDateTime.now());
-
             return AuthConverter.toLoginResponseDTO(tokenDTO);
-        } catch (UsernameNotFoundException | BadCredentialsException e) {
+        } catch (BadCredentialsException e) {
+            // 비밀번호가 일치하지 않는 경우
             throw new AuthHandler(ErrorStatus.INVALID_CREDENTIALS);
         }
     }
