@@ -17,7 +17,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.HandlerExceptionResolver;
+import sw.momolab.server.apiPayload.code.status.ErrorStatus;
+import sw.momolab.server.apiPayload.exception.TokenHandler;
 import sw.momolab.server.service.tokenService.JwtTokenService;
 
 import java.io.IOException;
@@ -29,7 +30,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
     private final UserDetailsService userDetailsService;
-    private final HandlerExceptionResolver handlerExceptionResolver;
 
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
@@ -55,17 +55,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 2. 토큰에서 사용자의 식별자를 추출
             userIdentifier = jwtTokenService.parseClaims(jwt).getSubject();
         } catch (ExpiredJwtException e) {
-            log.warn("만료된 JWT 토큰입니다: {}", e.getMessage());
-            handlerExceptionResolver.resolveException(request, response, null, e);
-            return;
+            throw new TokenHandler(ErrorStatus.TOKEN_EXPIRED);
         } catch (MalformedJwtException | SignatureException e) {
-            log.warn("잘못된 JWT 서명 또는 형식입니다: {}", e.getMessage());
-            handlerExceptionResolver.resolveException(request, response, null, e);
-            return;
+            throw new TokenHandler(ErrorStatus.TOKEN_INVALID);
         } catch (Exception e) {
-            log.error("기타 토큰 처리 중 예외 발생: {}", e.getMessage());
-            handlerExceptionResolver.resolveException(request, response, null, e);
-            return;
+            throw new TokenHandler(ErrorStatus.TOKEN_GENERAL_ERROR);
         }
 
         // 3. 사용자 인증 정보를 SecurityContext에 저장
