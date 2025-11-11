@@ -1,12 +1,12 @@
 package sw.momolab.server.config;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix = "cors")
 public record CorsProperties(
-        @NotNull String allowedOrigins
+        @NotBlank String allowedOrigins
 ) {
 }
