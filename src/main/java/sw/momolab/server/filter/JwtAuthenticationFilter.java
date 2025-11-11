@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 import sw.momolab.server.apiPayload.code.status.ErrorStatus;
 import sw.momolab.server.apiPayload.exception.TokenHandler;
 import sw.momolab.server.service.tokenService.JwtTokenService;
@@ -30,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenService jwtTokenService;
     private final UserDetailsService userDetailsService;
+    private final HandlerExceptionResolver handlerExceptionResolver;
 
     private static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String TOKEN_PREFIX = "Bearer ";
@@ -55,34 +57,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // 2. 토큰에서 사용자의 식별자를 추출
             userIdentifier = jwtTokenService.parseClaims(jwt).getSubject();
         } catch (ExpiredJwtException e) {
-            throw new TokenHandler(ErrorStatus.TOKEN_EXPIRED);
+            handlerExceptionResolver.resolveException(request, response, null,
+                    new TokenHandler(ErrorStatus.TOKEN_EXPIRED));
+            return;
         } catch (MalformedJwtException | SignatureException e) {
-            throw new TokenHandler(ErrorStatus.TOKEN_INVALID);
+            handlerExceptionResolver.resolveException(request, response, null,
+                    new TokenHandler(ErrorStatus.TOKEN_INVALID));
+            return;
         } catch (Exception e) {
-            throw new TokenHandler(ErrorStatus.TOKEN_GENERAL_ERROR);
+            handlerExceptionResolver.resolveException(request, response, null,
+                    new TokenHandler(ErrorStatus.TOKEN_GENERAL_ERROR));
+            return;
         }
 
         // 3. 사용자 인증 정보를 SecurityContext에 저장
         if (userIdentifier != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userIdentifier);
+            try {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userIdentifier);
 
-            // 인증 객체 생성
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    userDetails,
-                    null,
-                    userDetails.getAuthorities()
-            );
+                // 인증 객체 생성
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
 
-            // 요청 정보 설정
-            authToken.setDetails(
-                    new WebAuthenticationDetailsSource().buildDetails(request)
-            );
+                // 요청 정보 설정
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
 
-            // SecurityContext에 인증 정보 저장
-            SecurityContextHolder.getContext().setAuthentication(authToken);
+                // SecurityContext에 인증 정보 저장
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            } catch (Exception e) {
+                handlerExceptionResolver.resolveException(request, response, null,
+                        new TokenHandler(ErrorStatus.TOKEN_GENERAL_ERROR));
+                return;
+            }
         }
-
         filterChain.doFilter(request, response);
     }
 }
