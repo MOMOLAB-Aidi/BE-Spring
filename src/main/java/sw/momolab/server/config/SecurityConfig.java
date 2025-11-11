@@ -15,6 +15,7 @@ import sw.momolab.server.service.userService.CustomUserDetailsService;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     private final CustomUserDetailsService customUserDetailsService;
     private final CorsConfigurationSource corsConfigurationSource;
 
@@ -48,13 +49,13 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource));
 
-        //인증 없이 접근 가능한 URL 설정
+        // 인증 없이 접근 가능한 URL 설정
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
                         .requestMatchers("/api/v1/auth/**").permitAll()
-                        .anyRequest().authenticated() //나머지 요청은 인증 필요
+                        .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 );
 
         return http.build();

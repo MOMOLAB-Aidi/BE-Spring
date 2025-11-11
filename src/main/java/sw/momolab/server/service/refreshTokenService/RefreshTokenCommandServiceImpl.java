@@ -22,11 +22,9 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
     @Override
     public RefreshToken createRefreshToken(String refreshToken, User user) {
         Date expiryDate = jwtTokenUtil.parseClaims(refreshToken).getExpiration();
-
         LocalDateTime localDateTime = LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault());
 
         RefreshToken refreshTokenEntity = TokenConverter.toRefreshTokenResponseDTO(refreshToken, localDateTime, user);
-
         return refreshTokenRepository.save(refreshTokenEntity);
     }
 }

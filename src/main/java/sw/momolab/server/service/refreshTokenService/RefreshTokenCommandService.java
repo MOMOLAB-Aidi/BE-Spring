@@ -4,5 +4,5 @@ import sw.momolab.server.domain.User;
 import sw.momolab.server.domain.RefreshToken;
 
 public interface RefreshTokenCommandService {
-    RefreshToken createRefreshToken(String refreshToken, User patient);
+    RefreshToken createRefreshToken(String refreshToken, User user);
 }

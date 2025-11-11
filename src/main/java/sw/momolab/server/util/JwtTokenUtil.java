@@ -31,7 +31,7 @@ public class JwtTokenUtil {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // 토큰 생성
+    // at, rt 발급
     public TokenResponseDTO.TokenDTO generateToken(CustomUserDetails customUserDetails) {
         String accessToken = generateAccessToken(customUserDetails);
         String refreshToken = generateRefreshToken(customUserDetails);
@@ -48,30 +48,27 @@ public class JwtTokenUtil {
 
         // at 생성
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRATION_MS);
-        String accessToken = Jwts.builder()
+
+        return Jwts.builder()
                 .setSubject(customUserDetails.getUsername())
                 .claim("roles", authorities)
                 .claim("userId", customUserDetails.getId())
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
-
-        return accessToken;
     }
 
     public String generateRefreshToken(CustomUserDetails customUserDetails) {
         long now = (new Date()).getTime();
 
-        // Refresh Token 생성
-        String refreshToken = Jwts.builder()
+        // rt 생성
+        return Jwts.builder()
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRATION_MS))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
-
-        return refreshToken;
     }
 
-    //JWT 토큰에서 Claim 추출
+    // jwt 토큰에서 클레임 추출
     public Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder()

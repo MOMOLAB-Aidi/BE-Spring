@@ -57,9 +57,9 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     }
 
     @Override
-    public void setRefreshToken(String refreshToken, User patient) {
-        RefreshToken refreshTokenEntity = refreshTokenCommandService.createRefreshToken(refreshToken, patient);
-        patient.setRefreshToken(refreshTokenEntity);
+    public void setRefreshToken(String refreshToken, User user) {
+        RefreshToken refreshTokenEntity = refreshTokenCommandService.createRefreshToken(refreshToken, user);
+        user.setRefreshToken(refreshTokenEntity);
     }
 
     @Override

@@ -12,7 +12,7 @@ public class AuthResponseDTO {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(title = "로그인 응답")
+    @Schema(title = "로그인 응답 dto")
     public static class LoginResponseDTO {
         @Schema(description = "발급받은 토큰 목록")
         private TokenResponseDTO.TokenDTO tokens;

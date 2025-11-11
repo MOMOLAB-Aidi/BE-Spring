@@ -11,7 +11,7 @@ public class TokenResponseDTO {
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    @Schema(title = "토큰 발급 응답")
+    @Schema(title = "토큰 발급 응답 dto")
     public static class TokenDTO {
         @Schema(description = "액세스 토큰", example = "eyJhbGciOiJIUzI1NiJ9.eyJ...")
         private String accessToken;
