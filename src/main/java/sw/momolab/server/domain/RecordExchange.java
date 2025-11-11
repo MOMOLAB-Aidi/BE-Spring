@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 import sw.momolab.server.domain.common.BaseEntity;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 
+@Table(name = "record_exchange")
 @Entity
 @Getter
 @Builder
@@ -17,23 +19,29 @@ public class RecordExchange extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 구분(회차)
     @Column(nullable = false)
-    private Integer exchange_no; // 구분(회차)
+    private Integer exchangeNo;
 
+    // 교환 시각
     @Column(nullable = false)
-    private LocalTime exchange_time; // 교환 시각
+    private LocalTime exchangeTime;
 
+    // 배액량
     @Column(nullable = false)
-    private Integer drain_volume; // 배액량
+    private Integer drainVolume;
 
+    // 주입량
     @Column(nullable = false)
-    private Integer fill_volume; // 주입량
+    private Integer fillVolume;
 
+    // 주입액 농도
     @Column(nullable = false)
-    private Float fill_concentration; // 주입액 농도
+    private BigDecimal fillConcentration;
 
+    // 제수량
     @Column(nullable = false)
-    private Integer uf; // 제수량
+    private Integer uf;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "record_id", nullable = false)

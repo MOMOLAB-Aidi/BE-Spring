@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+@Table(name = "record")
 @Entity
 @Getter
 @Builder
@@ -21,43 +22,54 @@ public class Record extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 기록 날짜
     @Column(nullable = false)
-    private LocalDate record_date; // 기록 날짜
+    private LocalDate recordDate;
 
+    // 기록 요일
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private DayWeek record_dw; // 기록 요일
+    private DayWeek recordDw;
 
+    // 체중
     @Column(nullable = false)
-    private Float weight; // 체중
+    private Float weight;
 
+    // 최고 혈압
     @Column(nullable = false)
-    private Integer systolic; // 최고 혈압
+    private Integer systolic;
 
+    // 최저 혈압
     @Column(nullable = false)
-    private Integer diastolic; // 최저 혈압
+    private Integer diastolic;
 
+    // 공복 혈당
     @Column(nullable = false)
-    private Integer fasting_glucose; // 공복 혈당
+    private Integer fastingGlucose;
 
+    // 소변 횟수
     @Column(nullable = false)
-    private Integer urine_count; // 소변 횟수
+    private Integer urineCount;
 
+    // 복막액 혼탁
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Turbidity turbidity; // 복막액 혼탁
+    private Turbidity turbidity;
 
+    // 제수량 합계
     @Column(nullable = false)
-    private Integer total_uf; // 제수량 합계
+    private Integer totalUf;
 
+    // 비고 (선택)
     @Lob
     @Column(columnDefinition = "TEXT")
-    private String notes; // 비고
+    private String notes;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "patient_id", nullable = false)
-    private Patient patient;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
+    @Builder.Default
     @OneToMany(mappedBy = "record", cascade = CascadeType.ALL)
     private List<RecordExchange> recordExchangeList = new ArrayList<>();
 }
