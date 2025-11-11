@@ -4,9 +4,11 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import sw.momolab.server.converter.TokenConverter;
 import sw.momolab.server.domain.CustomUserDetails;
 import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
@@ -15,13 +17,15 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-@Component
-public class JwtTokenService {
+@Service
+@RequiredArgsConstructor
+public class JwtTokenServiceImpl implements JwtTokenService {
     private final SecretKey key;
     private final long ACCESS_TOKEN_EXPIRATION_MS;
     private final long REFRESH_TOKEN_EXPIRATION_MS;
 
-    public JwtTokenService(Environment env) {
+    @Autowired
+    public JwtTokenServiceImpl(Environment env) {
 
         // Environment를 사용하여 프로퍼티 값을 읽어옴
         String secretKey = env.getRequiredProperty("JWT_SECRET_KEY");
@@ -37,7 +41,7 @@ public class JwtTokenService {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // at, rt 발급
+    @Override
     public TokenResponseDTO.TokenDTO generateToken(CustomUserDetails customUserDetails) {
         String accessToken = generateAccessToken(customUserDetails);
         String refreshToken = generateRefreshToken(customUserDetails);
@@ -45,6 +49,7 @@ public class JwtTokenService {
         return TokenConverter.toTokenResponseDTO(accessToken, refreshToken);
     }
 
+    @Override
     public String generateAccessToken(CustomUserDetails customUserDetails) {
         String authorities = customUserDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -64,6 +69,7 @@ public class JwtTokenService {
                 .compact();
     }
 
+    @Override
     public String generateRefreshToken(CustomUserDetails customUserDetails) {
         long now = (new Date()).getTime();
 
@@ -76,6 +82,7 @@ public class JwtTokenService {
     }
 
     // jwt 토큰에서 클레임 추출, 만료된 토큰에 대해서는 예외를 그대로 전파
+    @Override
     public Claims parseClaims(String token) {
         return Jwts.parser()
                 .verifyWith(key)

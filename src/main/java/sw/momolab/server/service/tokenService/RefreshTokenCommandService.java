@@ -1,4 +1,4 @@
-package sw.momolab.server.service.refreshTokenService;
+package sw.momolab.server.service.tokenService;
 
 import sw.momolab.server.domain.User;
 import sw.momolab.server.domain.RefreshToken;

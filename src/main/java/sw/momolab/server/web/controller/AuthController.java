@@ -13,7 +13,7 @@ import sw.momolab.server.service.authService.AuthCommandService;
 import sw.momolab.server.web.dto.AuthDTO.AuthRequestDTO;
 import sw.momolab.server.web.dto.AuthDTO.AuthResponseDTO;
 
-@Tag(name = "Auth", description = "인증 관련 API")
+@Tag(name = "auth", description = "인증 관련 API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
