@@ -33,7 +33,7 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
         Date expiryDate = jwtTokenService.parseClaims(refreshToken).getExpiration();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault());
 
-        RefreshToken refreshTokenEntity = TokenConverter.toRefreshTokenDTO(refreshToken, localDateTime, user);
+        RefreshToken refreshTokenEntity = TokenConverter.toRefreshTokenEntity(refreshToken, localDateTime, user);
         return refreshTokenRepository.save(refreshTokenEntity);
     }
 
@@ -61,11 +61,5 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
         String accessToken = jwtTokenService.generateAccessToken(customUserDetails); // at 생성
 
         return TokenConverter.toAccessTokenDTO(accessToken);
-    }
-
-    @Override
-    @Transactional
-    public void deleteRefreshToken(RefreshToken refreshToken) {
-        refreshTokenRepository.delete(refreshToken);
     }
 }

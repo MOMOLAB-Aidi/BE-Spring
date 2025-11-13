@@ -7,7 +7,7 @@ import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
 import java.time.LocalDateTime;
 
 public class TokenConverter {
-    public static RefreshToken toRefreshTokenDTO(String refreshToken, LocalDateTime expiryDate, User user) {
+    public static RefreshToken toRefreshTokenEntity(String refreshToken, LocalDateTime expiryDate, User user) {
         return RefreshToken.builder()
                 .refreshToken(refreshToken)
                 .expiryDate(expiryDate)

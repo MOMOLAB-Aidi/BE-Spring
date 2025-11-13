@@ -8,6 +8,4 @@ import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
 public interface RefreshTokenCommandService {
     RefreshToken createRefreshToken(String refreshToken, User user);
     TokenResponseDTO.AccessTokenDTO reissueToken(TokenRequestDTO.ReissueDTO reissueDTO);
-
-    void deleteRefreshToken(RefreshToken refreshToken);
 }
