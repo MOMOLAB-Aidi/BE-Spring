@@ -18,4 +18,14 @@ public class TokenResponseDTO {
         @Schema(description = "리프레시 토큰", example = "eyJhbGciOiJIUzI1NiJ9.eyJ...")
         private String refreshToken;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(title = "액세스 토큰 발급 응답 dto")
+    public static class AccessTokenDTO {
+        @Schema(description = "액세스 토큰", example = "eyJhbGciOiJIUzI1NiJ9.eyJ...")
+        private String accessToken;
+    }
 }

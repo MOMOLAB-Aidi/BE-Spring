@@ -44,7 +44,7 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private UserRole role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private RefreshToken refreshToken;
 
     @Builder.Default
@@ -57,5 +57,9 @@ public class User extends BaseEntity {
 
     public void setRefreshToken(RefreshToken refreshTokenEntity) {
         this.refreshToken = refreshTokenEntity;
+    }
+
+    public void deleteRefreshToken() {
+        this.refreshToken = null;
     }
 }

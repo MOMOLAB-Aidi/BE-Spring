@@ -22,6 +22,10 @@ public enum ErrorStatus implements BaseErrorCode {
     TOKEN_GENERAL_ERROR(HttpStatus.UNAUTHORIZED, "AUTH_401_04", "기타 토큰 인증 오류입니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH_401_05", "인증 정보가 필요합니다."),
 
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH_401_06", "유효하지 않은 Refresh Token입니다."),
+
+    USER_STATUS_INACTIVE(HttpStatus.FORBIDDEN, "USER_403_01", "탈퇴한 회원입니다."),
+
     ;
 
     private final HttpStatus httpStatus;

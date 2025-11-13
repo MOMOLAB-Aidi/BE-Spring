@@ -46,7 +46,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         String accessToken = generateAccessToken(customUserDetails);
         String refreshToken = generateRefreshToken(customUserDetails);
 
-        return TokenConverter.toTokenResponseDTO(accessToken, refreshToken);
+        return TokenConverter.toTokenDTO(accessToken, refreshToken);
     }
 
     @Override

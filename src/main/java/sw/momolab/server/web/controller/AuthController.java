@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import sw.momolab.server.apiPayload.ApiResponse;
 import sw.momolab.server.service.authService.AuthCommandService;
+import sw.momolab.server.service.tokenService.RefreshTokenCommandService;
 import sw.momolab.server.web.dto.AuthDTO.AuthRequestDTO;
 import sw.momolab.server.web.dto.AuthDTO.AuthResponseDTO;
+import sw.momolab.server.web.dto.TokenDTO.TokenRequestDTO;
+import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
 
 @Tag(name = "auth", description = "인증 관련 API")
 @RestController
@@ -20,11 +23,19 @@ import sw.momolab.server.web.dto.AuthDTO.AuthResponseDTO;
 public class AuthController {
 
     private final AuthCommandService authCommandService;
+    private final RefreshTokenCommandService refreshTokenCommandService;
 
     @PostMapping("/login")
     @Operation(summary = "로그인 인증 API", description = "등록한 계정의 아이디와 비밀번호가 일치하면 로그인에 성공합니다.")
     public ApiResponse<AuthResponseDTO.LoginResponseDTO> login(@RequestBody @Valid AuthRequestDTO.LoginRequestDTO request) {
         AuthResponseDTO.LoginResponseDTO result = authCommandService.login(request);
+        return ApiResponse.onSuccess(result);
+    }
+
+    @PostMapping("/reissue")
+    @Operation(summary = "토큰 재발급 API", description = "refreshToken 값을 넘겨서 accessToken을 재발급받습니다.")
+    public ApiResponse<TokenResponseDTO.AccessTokenDTO> reissueToken(@RequestBody @Valid TokenRequestDTO.ReissueDTO reissueDTO) {
+        TokenResponseDTO.AccessTokenDTO result = refreshTokenCommandService.reissueToken(reissueDTO);
         return ApiResponse.onSuccess(result);
     }
 }
