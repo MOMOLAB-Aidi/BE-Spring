@@ -44,6 +44,13 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
             throw new AuthHandler(ErrorStatus.TOKEN_INVALID);
         }
 
+        // JWT 서명 및 기본 클레임 검증
+        try {
+            jwtTokenService.parseClaims(reissueDTO.getRefreshToken());
+        } catch (Exception e) {
+            throw new AuthHandler(ErrorStatus.TOKEN_INVALID);
+        }
+
         RefreshToken storedRefreshToken = refreshTokenRepository.findByRefreshToken(reissueDTO.getRefreshToken())
                 .orElseThrow(() -> new AuthHandler(ErrorStatus.REFRESH_TOKEN_NOT_FOUND));
 
