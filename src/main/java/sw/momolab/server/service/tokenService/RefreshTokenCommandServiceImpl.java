@@ -37,9 +37,13 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
         return refreshTokenRepository.save(refreshTokenEntity);
     }
 
-    @Transactional(noRollbackFor = AuthHandler.class)
+    @Transactional(readOnly = true)
     @Override
     public TokenResponseDTO.AccessTokenDTO reissueToken(TokenRequestDTO.ReissueDTO reissueDTO) {
+        if (reissueDTO == null || reissueDTO.getRefreshToken() == null || reissueDTO.getRefreshToken().isBlank()) {
+            throw new AuthHandler(ErrorStatus.TOKEN_INVALID);
+        }
+
         RefreshToken storedRefreshToken = refreshTokenRepository.findByRefreshToken(reissueDTO.getRefreshToken())
                 .orElseThrow(() -> new AuthHandler(ErrorStatus.REFRESH_TOKEN_NOT_FOUND));
 
@@ -50,7 +54,6 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
             throw new UserHandler(ErrorStatus.USER_STATUS_INACTIVE);
 
         if (storedRefreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
-            storedRefreshToken.getUser().deleteRefreshToken();
             throw new AuthHandler(ErrorStatus.TOKEN_EXPIRED);
         }
 
