@@ -29,9 +29,6 @@ public class RecordQueryServiceImpl implements RecordQueryService {
         LocalDate endDate = yearMonth.atEndOfMonth();
 
         Set<LocalDate> recordedDates = recordRepository.findDistinctRecordDatesByUserIdAndDateRange(userId, startDate, endDate);
-        Set<String> recordedDateStrings = recordedDates.stream()
-                .map(LocalDate::toString)
-                .collect(Collectors.toSet());
 
         // 해당 월의 모든 날짜를 순회하며 DTO를 생성
         int daysInMonth = yearMonth.lengthOfMonth();
@@ -40,7 +37,7 @@ public class RecordQueryServiceImpl implements RecordQueryService {
                 .mapToObj(day -> {
                     LocalDate date = yearMonth.atDay(day);
                     // 기록이 존재하는지 확인
-                    boolean hasSchedule = recordedDateStrings.contains(date.toString());
+                    boolean hasSchedule = recordedDates.contains(date);
 
                     return RecordConverter.toCalendarResponseDTO(date, hasSchedule);
                 })

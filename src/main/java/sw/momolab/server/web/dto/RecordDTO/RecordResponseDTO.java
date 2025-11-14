@@ -1,5 +1,6 @@
 package sw.momolab.server.web.dto.RecordDTO;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +16,10 @@ public class RecordResponseDTO {
     public static class CalendarResponseDTO{
 
         @Schema(description = "날짜")
+        @JsonFormat(pattern = "yyyy-MM-dd")
         private LocalDate date;
 
         @Schema(description = "기록 여부", example = "true")
-        private Boolean hasSchedule;
+        private boolean hasSchedule;
     }
 }

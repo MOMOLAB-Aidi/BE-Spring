@@ -66,7 +66,7 @@ public class Record extends BaseEntity {
     private String notes;
 
     // GCS에 저장된 OCR 이미지 파일 경로
-    @Column
+    @Column(length = 512)
     private String gcsPath;
 
     @ManyToOne(fetch = FetchType.LAZY)
