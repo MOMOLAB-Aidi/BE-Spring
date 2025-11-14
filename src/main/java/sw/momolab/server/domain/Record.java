@@ -65,6 +65,10 @@ public class Record extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
+    // GCS에 저장된 OCR 이미지 파일 경로
+    @Column
+    private String gcsPath;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
