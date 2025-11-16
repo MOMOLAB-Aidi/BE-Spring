@@ -97,8 +97,6 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         if (user.getRefreshToken() != null) {
             RefreshToken refreshToken = user.getRefreshToken();
             user.deleteRefreshToken();
-            userRepository.save(user);
-
             refreshTokenCommandService.deleteRefreshToken(refreshToken);
         }
     }
