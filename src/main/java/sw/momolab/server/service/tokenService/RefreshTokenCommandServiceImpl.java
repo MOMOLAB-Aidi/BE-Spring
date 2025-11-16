@@ -69,4 +69,10 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
 
         return TokenConverter.toAccessTokenDTO(accessToken);
     }
+
+    @Override
+    @Transactional
+    public void deleteRefreshToken(RefreshToken refreshToken) {
+        refreshTokenRepository.delete(refreshToken);
+    }
 }

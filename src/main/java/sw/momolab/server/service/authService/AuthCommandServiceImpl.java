@@ -84,4 +84,21 @@ public class AuthCommandServiceImpl implements AuthCommandService {
         //인증 성공 시 JWT 토큰 생성
         return jwtTokenService.generateToken((CustomUserDetails) authentication.getPrincipal());
     }
+
+    @Override
+    @Transactional
+    public void logout(Long userId){
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AuthHandler(ErrorStatus.INVALID_CREDENTIALS));
+
+        // RefreshToken이 있는 경우에만 삭제 처리
+        if (user.getRefreshToken() != null) {
+            RefreshToken refreshToken = user.getRefreshToken();
+            user.deleteRefreshToken();
+            userRepository.save(user);
+
+            refreshTokenCommandService.deleteRefreshToken(refreshToken);
+        }
+    }
 }
