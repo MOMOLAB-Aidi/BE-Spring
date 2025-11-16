@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,5 +38,12 @@ public class AuthController {
     public ApiResponse<TokenResponseDTO.AccessTokenDTO> reissueToken(@RequestBody @Valid TokenRequestDTO.ReissueDTO reissueDTO) {
         TokenResponseDTO.AccessTokenDTO result = refreshTokenCommandService.reissueToken(reissueDTO);
         return ApiResponse.onSuccess(result);
+    }
+
+    @PostMapping("/logout")
+    @Operation(summary = "로그아웃 API", description = "사용자의 refreshToken 값을 삭제합니다.")
+    public ApiResponse<Void> logout(@AuthenticationPrincipal(expression = "id") Long userId) {
+        authCommandService.logout(userId);
+        return ApiResponse.onSuccess();
     }
 }
