@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import sw.momolab.server.domain.Record;
 
 import java.time.LocalDate;
+import java.util.Optional;
 import java.util.Set;
 
 public interface RecordRepository extends JpaRepository<Record, Long> {
@@ -16,4 +17,8 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
             @Param("userId") Long userId,
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    // 처음 기록 작성 날짜 조회
+    @Query("SELECT MIN(r.recordDate) FROM Record r WHERE r.user.id = :userId")
+    Optional<LocalDate> findFirstRecordDateByUserId(@Param("userId") Long userId);
 }
