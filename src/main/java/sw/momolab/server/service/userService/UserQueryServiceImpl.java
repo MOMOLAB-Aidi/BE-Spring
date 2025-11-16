@@ -13,27 +13,36 @@ import sw.momolab.server.web.dto.UserDTO.UserResponseDTO;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserQueryServiceImpl implements UserQueryService {
 
     private final RecordRepository recordRepository;
     private final UserRepository userRepository;
 
     @Override
-    @Transactional(readOnly = true)
     public UserResponseDTO.MyPageDTO getMyPage(Long userId) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         // 사용자가 처음으로 일기를 작성한 날짜 조회
-        LocalDate firstRecordDate = recordRepository.findFirstRecordDateByUserId(userId)
-                .orElse(LocalDate.now()); // 작성 기록이 없으면 오늘 날짜를 기본값으로 사용
+        Optional<LocalDate> firstRecordDateOpt = recordRepository.findFirstRecordDateByUserId(userId);
 
-        long days = ChronoUnit.DAYS.between(firstRecordDate, LocalDate.now());
-        String dPlusPeriod = "D+" + days;
+        LocalDate firstRecordDate;
+        String dPlusPeriod;
+
+        if (firstRecordDateOpt.isPresent()) {
+            firstRecordDate = firstRecordDateOpt.get();
+            long days = ChronoUnit.DAYS.between(firstRecordDate, LocalDate.now());
+            dPlusPeriod = "D+" + days;
+        } else {
+            firstRecordDate = null;
+            dPlusPeriod = "기록 없음";
+        }
 
         return UserConverter.toMyPageDTO(user, firstRecordDate, dPlusPeriod);
     }
