@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sw.momolab.server.apiPayload.code.status.ErrorStatus;
 import sw.momolab.server.apiPayload.exception.AuthHandler;
+import sw.momolab.server.apiPayload.exception.UserHandler;
 import sw.momolab.server.converter.AuthConverter;
 import sw.momolab.server.domain.CustomUserDetails;
 import sw.momolab.server.domain.RefreshToken;
@@ -87,10 +88,10 @@ public class AuthCommandServiceImpl implements AuthCommandService {
 
     @Override
     @Transactional
-    public void logout(Long userId){
+    public void logout(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new AuthHandler(ErrorStatus.INVALID_CREDENTIALS));
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         // RefreshToken이 있는 경우에만 삭제 처리
         if (user.getRefreshToken() != null) {
