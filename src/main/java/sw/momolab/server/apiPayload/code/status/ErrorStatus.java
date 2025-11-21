@@ -27,6 +27,8 @@ public enum ErrorStatus implements BaseErrorCode {
     USER_STATUS_INACTIVE(HttpStatus.FORBIDDEN, "USER_403_01", "탈퇴한 사용자입니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_404_01", "사용자를 찾을 수 없습니다."),
 
+    PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "PWD_400_01", "비밀번호 확인이 일치하지 않습니다."),
+    PASSWORD_UPDATE_NO_CHANGE(HttpStatus.BAD_REQUEST, "PWD_400_02", "새로운 비밀번호를 입력해주세요."),
 
     ;
 
