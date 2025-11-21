@@ -51,6 +51,10 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Record> recordList = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ConsultLog> consultLogList = new ArrayList<>();
+
     public void updateLastLoginAt(LocalDateTime now) {
         this.lastLoginAt = now;
     }
