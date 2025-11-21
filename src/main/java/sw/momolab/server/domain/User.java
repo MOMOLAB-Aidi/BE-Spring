@@ -63,6 +63,10 @@ public class User extends BaseEntity {
         this.refreshToken = refreshTokenEntity;
     }
 
+    public void encodePassword(String password) {
+        this.password = password;
+    }
+
     public void deleteRefreshToken() {
         this.refreshToken = null;
     }
