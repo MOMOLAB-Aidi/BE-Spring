@@ -43,21 +43,33 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
         return refreshTokenRepository.save(refreshTokenEntity);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @Override
     public TokenResponseDTO.AccessTokenDTO reissueToken(TokenRequestDTO.ReissueDTO reissueDTO) {
         if (reissueDTO == null || reissueDTO.getRefreshToken() == null || reissueDTO.getRefreshToken().isBlank()) {
             throw new AuthHandler(ErrorStatus.TOKEN_INVALID);
         }
 
-        // JWT 서명 및 기본 클레임 검증
+        String clientRefreshToken = reissueDTO.getRefreshToken();
+
+        // 1. 클라이언트가 보낸 평문 RT를 암호화하여 DB 검색 키로 사용
+        String encryptedClientRT;
         try {
-            jwtTokenService.parseClaims(reissueDTO.getRefreshToken());
+            encryptedClientRT = aesTokenEncryptor.encrypt(clientRefreshToken);
+        } catch (Exception e) {
+            // 암호화 과정에서 실패하면 토큰 자체가 유효하지 않다고 간주
+            throw new AuthHandler(ErrorStatus.TOKEN_INVALID);
+        }
+
+        // 2. JWT 서명 및 기본 클레임 검증 (클라이언트 rt 사용)
+        try {
+            jwtTokenService.parseClaims(clientRefreshToken);
         } catch (Exception e) {
             throw new AuthHandler(ErrorStatus.TOKEN_INVALID);
         }
 
-        RefreshToken storedRefreshToken = refreshTokenRepository.findByRefreshToken(reissueDTO.getRefreshToken())
+        // 3. 암호화된 토큰으로 엔티티 조회
+        RefreshToken storedRefreshToken = refreshTokenRepository.findByRefreshToken(encryptedClientRT)
                 .orElseThrow(() -> new AuthHandler(ErrorStatus.REFRESH_TOKEN_NOT_FOUND));
 
         if (storedRefreshToken.getUser() == null)
@@ -70,8 +82,9 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
             throw new AuthHandler(ErrorStatus.TOKEN_EXPIRED);
         }
 
+        // 새로운 at 생성
         CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(storedRefreshToken.getUser().getLoginId());
-        String accessToken = jwtTokenService.generateAccessToken(customUserDetails); // at 생성
+        String accessToken = jwtTokenService.generateAccessToken(customUserDetails);
 
         return TokenConverter.toAccessTokenDTO(accessToken);
     }
