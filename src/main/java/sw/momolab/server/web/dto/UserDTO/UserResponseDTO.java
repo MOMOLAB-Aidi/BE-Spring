@@ -25,7 +25,7 @@ public class UserResponseDTO {
         @Schema(description = "기록 일지를 작성해온 기간", example = "D+15")
         private String recordPeriod;
 
-        @Schema(description = "마지막으로 로그인한 날짜")
+        @Schema(description = "마지막으로 로그인한 날짜와 시각")
         private LocalDateTime lastLoginAt;
     }
 }

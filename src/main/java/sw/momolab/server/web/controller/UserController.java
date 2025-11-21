@@ -23,7 +23,7 @@ public class UserController {
     private final UserCommandService userCommandService;
 
     @GetMapping("/mypage")
-    @Operation(summary = "마이페이지 조회 API", description = "사용자의 아이디와 최초 기록 날짜, 기록을 작성해온 기간을 조회합니다.")
+    @Operation(summary = "마이페이지 조회 API", description = "사용자의 아이디와 최초 기록 날짜, 기록을 작성해온 기간, 그리고 마지막으로 로그인한 날짜와 시각을 조회합니다.")
     public ApiResponse<UserResponseDTO.MyPageDTO> getMyPage(@AuthenticationPrincipal(expression = "id") Long userId) {
         UserResponseDTO.MyPageDTO result = userQueryService.getMyPage(userId);
         return ApiResponse.onSuccess(result);
