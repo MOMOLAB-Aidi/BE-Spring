@@ -1,4 +1,4 @@
-package sw.momolab.server.service.cryptoService;
+package sw.momolab.server.util;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;

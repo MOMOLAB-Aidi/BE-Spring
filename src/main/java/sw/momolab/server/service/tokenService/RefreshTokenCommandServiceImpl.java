@@ -12,7 +12,7 @@ import sw.momolab.server.domain.RefreshToken;
 import sw.momolab.server.domain.User;
 import sw.momolab.server.domain.enums.UserStatus;
 import sw.momolab.server.repository.RefreshTokenRepository;
-import sw.momolab.server.service.cryptoService.AesTokenEncryptor;
+import sw.momolab.server.util.AesTokenEncryptor;
 import sw.momolab.server.service.userService.CustomUserDetailsService;
 import sw.momolab.server.web.dto.TokenDTO.TokenRequestDTO;
 import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
