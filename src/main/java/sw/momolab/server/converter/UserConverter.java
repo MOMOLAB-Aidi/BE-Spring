@@ -11,6 +11,7 @@ public class UserConverter {
                 .loginId(user.getLoginId())
                 .recordStartDate(firstRecordDate)
                 .recordPeriod(dPlusPeriod)
+                .lastLoginAt(user.getLastLoginAt())
                 .build();
     }
 }

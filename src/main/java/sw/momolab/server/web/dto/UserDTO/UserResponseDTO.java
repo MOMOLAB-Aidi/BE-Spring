@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class UserResponseDTO {
     @Builder
@@ -23,5 +24,8 @@ public class UserResponseDTO {
 
         @Schema(description = "기록 일지를 작성해온 기간", example = "D+15")
         private String recordPeriod;
+
+        @Schema(description = "마지막으로 로그인한 날짜")
+        private LocalDateTime lastLoginAt;
     }
 }
