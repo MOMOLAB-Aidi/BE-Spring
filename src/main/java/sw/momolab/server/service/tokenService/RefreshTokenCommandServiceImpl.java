@@ -12,7 +12,7 @@ import sw.momolab.server.domain.RefreshToken;
 import sw.momolab.server.domain.User;
 import sw.momolab.server.domain.enums.UserStatus;
 import sw.momolab.server.repository.RefreshTokenRepository;
-import sw.momolab.server.util.AesTokenEncryptor;
+import sw.momolab.server.util.TokenHasher;
 import sw.momolab.server.service.userService.CustomUserDetailsService;
 import sw.momolab.server.web.dto.TokenDTO.TokenRequestDTO;
 import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
@@ -28,12 +28,12 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenService jwtTokenService;
     private final CustomUserDetailsService customUserDetailsService;
-    private final AesTokenEncryptor aesTokenEncryptor;
+    private final TokenHasher tokenHasher;
 
     @Override
     public RefreshToken createRefreshToken(String refreshToken, User user) {
         // refreshToken 암호화
-        String encryptedRefreshToken = aesTokenEncryptor.encrypt(refreshToken);
+        String encryptedRefreshToken = tokenHasher.hash(refreshToken);
 
         Date expiryDate = jwtTokenService.parseClaims(refreshToken).getExpiration();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault());
@@ -55,7 +55,7 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
         // 1. 클라이언트가 보낸 평문 RT를 암호화하여 DB 검색 키로 사용
         String encryptedClientRT;
         try {
-            encryptedClientRT = aesTokenEncryptor.encrypt(clientRefreshToken);
+            encryptedClientRT = tokenHasher.hash(clientRefreshToken);
         } catch (Exception e) {
             // 암호화 과정에서 실패하면 토큰 자체가 유효하지 않다고 간주
             throw new AuthHandler(ErrorStatus.TOKEN_INVALID);
