@@ -25,8 +25,8 @@ public class TokenHasher {
         // 비밀 키를 바이트 배열로 변환
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
 
-        if (keyBytes.length != 16 && keyBytes.length != 24 && keyBytes.length != 32) {
-            throw new IllegalStateException("token.hmac-secret-key 는 16/24/32 바이트여야 합니다.");
+        if (keyBytes.length < 32) {
+            throw new IllegalStateException("token.hmac-secret-key는 최소 32바이트 이상이어야 합니다.");
         }
 
         // MacKeySpec 생성
@@ -35,7 +35,10 @@ public class TokenHasher {
 
     // 토큰 HMAC 해시 생성
     public String hash(String text) {
-        if (text == null) return null;
+        if (text == null || text.isBlank()) {
+            throw new IllegalArgumentException("해시할 텍스트는 null이거나 비어있을 수 없습니다.");
+        }
+
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
             mac.init(macKeySpec);

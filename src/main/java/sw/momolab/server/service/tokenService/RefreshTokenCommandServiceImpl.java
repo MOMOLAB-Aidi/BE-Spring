@@ -32,18 +32,18 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
 
     @Override
     public RefreshToken createRefreshToken(String refreshToken, User user) {
-        // refreshToken 암호화
-        String encryptedRefreshToken = tokenHasher.hash(refreshToken);
+        // refreshToken 해시 생성
+        String hashedRefreshToken = tokenHasher.hash(refreshToken);
 
         Date expiryDate = jwtTokenService.parseClaims(refreshToken).getExpiration();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault());
 
-        // 암호화된 토큰을 DB에 저장
-        RefreshToken refreshTokenEntity = TokenConverter.toRefreshTokenEntity(encryptedRefreshToken, localDateTime, user);
+        // 해시된 토큰을 DB에 저장
+        RefreshToken refreshTokenEntity = TokenConverter.toRefreshTokenEntity(hashedRefreshToken, localDateTime, user);
         return refreshTokenRepository.save(refreshTokenEntity);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public TokenResponseDTO.AccessTokenDTO reissueToken(TokenRequestDTO.ReissueDTO reissueDTO) {
         if (reissueDTO == null || reissueDTO.getRefreshToken() == null || reissueDTO.getRefreshToken().isBlank()) {
@@ -52,12 +52,12 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
 
         String clientRefreshToken = reissueDTO.getRefreshToken();
 
-        // 1. 클라이언트가 보낸 평문 RT를 암호화하여 DB 검색 키로 사용
-        String encryptedClientRT;
+        // 1. 클라이언트가 보낸 평문 RT를 해시하여 DB 검색 키로 사용
+        String hashedClientRT;
         try {
-            encryptedClientRT = tokenHasher.hash(clientRefreshToken);
+            hashedClientRT = tokenHasher.hash(clientRefreshToken);
         } catch (Exception e) {
-            // 암호화 과정에서 실패하면 토큰 자체가 유효하지 않다고 간주
+            // 해싱 과정에서 실패하면 토큰 자체가 유효하지 않다고 간주
             throw new AuthHandler(ErrorStatus.TOKEN_INVALID);
         }
 
@@ -68,8 +68,8 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
             throw new AuthHandler(ErrorStatus.TOKEN_INVALID);
         }
 
-        // 3. 암호화된 토큰으로 엔티티 조회
-        RefreshToken storedRefreshToken = refreshTokenRepository.findByRefreshToken(encryptedClientRT)
+        // 3. 해시된 토큰으로 엔티티 조회
+        RefreshToken storedRefreshToken = refreshTokenRepository.findByRefreshToken(hashedClientRT)
                 .orElseThrow(() -> new AuthHandler(ErrorStatus.REFRESH_TOKEN_NOT_FOUND));
 
         if (storedRefreshToken.getUser() == null)
