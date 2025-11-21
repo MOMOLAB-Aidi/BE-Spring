@@ -20,12 +20,17 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public void resetPassword(Long userId, UserRequestDTO.ResetPasswordDTO request) {
+    public void updatePassword(Long userId, UserRequestDTO.ResetPasswordDTO request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
 
         if (user.getStatus() == UserStatus.INACTIVE)
             throw new UserHandler(ErrorStatus.USER_STATUS_INACTIVE);
+
+        // 비밀번호 확인 불일치 예외 처리
+        if (!request.getPassword().equals(request.getPasswordCheck())) {
+            throw new UserHandler(ErrorStatus.PASSWORD_NOT_MATCH);
+        }
 
         // 비밀번호 변경사항 없을 때 예외 처리
         String rawPassword = request.getPassword();

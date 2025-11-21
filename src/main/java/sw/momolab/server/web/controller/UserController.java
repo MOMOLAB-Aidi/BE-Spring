@@ -2,6 +2,7 @@ package sw.momolab.server.web.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -31,8 +32,8 @@ public class UserController {
 
     @PatchMapping("/password")
     @Operation(summary = "비밀번호 재설정 API", description = "로그인한 사용자의 비밀번호를 재설정합니다.")
-    public ApiResponse<Void> resetPassword(@AuthenticationPrincipal(expression = "id") Long userId, @RequestBody UserRequestDTO.ResetPasswordDTO request) {
-        userCommandService.resetPassword(userId, request);
+    public ApiResponse<Void> updatePassword(@AuthenticationPrincipal(expression = "id") Long userId, @RequestBody @Valid UserRequestDTO.ResetPasswordDTO request) {
+        userCommandService.updatePassword(userId, request);
         return ApiResponse.onSuccess();
     }
 }
