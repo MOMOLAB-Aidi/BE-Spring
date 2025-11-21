@@ -12,6 +12,7 @@ import sw.momolab.server.domain.RefreshToken;
 import sw.momolab.server.domain.User;
 import sw.momolab.server.domain.enums.UserStatus;
 import sw.momolab.server.repository.RefreshTokenRepository;
+import sw.momolab.server.service.cryptoService.AesTokenEncryptor;
 import sw.momolab.server.service.userService.CustomUserDetailsService;
 import sw.momolab.server.web.dto.TokenDTO.TokenRequestDTO;
 import sw.momolab.server.web.dto.TokenDTO.TokenResponseDTO;
@@ -27,13 +28,18 @@ public class RefreshTokenCommandServiceImpl implements RefreshTokenCommandServic
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenService jwtTokenService;
     private final CustomUserDetailsService customUserDetailsService;
+    private final AesTokenEncryptor aesTokenEncryptor;
 
     @Override
     public RefreshToken createRefreshToken(String refreshToken, User user) {
+        // refreshToken 암호화
+        String encryptedRefreshToken = aesTokenEncryptor.encrypt(refreshToken);
+
         Date expiryDate = jwtTokenService.parseClaims(refreshToken).getExpiration();
         LocalDateTime localDateTime = LocalDateTime.ofInstant(expiryDate.toInstant(), ZoneId.systemDefault());
 
-        RefreshToken refreshTokenEntity = TokenConverter.toRefreshTokenEntity(refreshToken, localDateTime, user);
+        // 암호화된 토큰을 DB에 저장
+        RefreshToken refreshTokenEntity = TokenConverter.toRefreshTokenEntity(encryptedRefreshToken, localDateTime, user);
         return refreshTokenRepository.save(refreshTokenEntity);
     }
 
