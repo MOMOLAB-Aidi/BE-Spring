@@ -53,22 +53,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
 
     @Override
     public String generateAccessToken(CustomUserDetails customUserDetails) {
-        String authorities = customUserDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        long now = (new Date()).getTime();
-
-        // at 생성
-        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRATION_MS);
-
-        return Jwts.builder()
-                .subject(customUserDetails.getUsername())
-                .claim("roles", authorities)
-                .claim("userId", customUserDetails.getId())
-                .expiration(accessTokenExpiresIn)
-                .signWith(key)
-                .compact();
+        return buildAccessToken(customUserDetails, ACCESS_TOKEN_EXPIRATION_MS);
     }
 
     @Override
@@ -86,20 +71,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     // 테스트용 accessToken
     @Override
     public String generateTestAccessToken(CustomUserDetails customUserDetails) {
-        String authorities = customUserDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-
-        long now = (new Date()).getTime();
-        Date accessTokenExpiresIn = new Date(now + TEST_ACCESS_TOKEN_EXPIRATION_MS);
-
-        return Jwts.builder()
-                .subject(customUserDetails.getUsername())
-                .claim("roles", authorities)
-                .claim("userId", customUserDetails.getId())
-                .expiration(accessTokenExpiresIn)
-                .signWith(key)
-                .compact();
+        return buildAccessToken(customUserDetails, TEST_ACCESS_TOKEN_EXPIRATION_MS);
     }
 
     // jwt 토큰에서 클레임 추출, 만료된 토큰에 대해서는 예외를 그대로 전파
@@ -110,5 +82,28 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
+
+
+    // CustomUserDetails에서 권한 목록을 콤마로 이어붙인 문자열로 변환
+    private String extractAuthorities(CustomUserDetails customUserDetails) {
+        return customUserDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+    }
+
+    // 만료 시간을 받아 at를 생성하는 공통 메서드
+    private String buildAccessToken(CustomUserDetails customUserDetails, long expirationMs) {
+        String authorities = extractAuthorities(customUserDetails);
+        long now = System.currentTimeMillis();
+        Date expiresAt = new Date(now + expirationMs);
+
+        return Jwts.builder()
+                .subject(customUserDetails.getUsername())
+                .claim("roles", authorities)
+                .claim("userId", customUserDetails.getId())
+                .expiration(expiresAt)
+                .signWith(key)
+                .compact();
     }
 }
