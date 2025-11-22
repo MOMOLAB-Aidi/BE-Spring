@@ -24,6 +24,8 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     private final long ACCESS_TOKEN_EXPIRATION_MS;
     private final long REFRESH_TOKEN_EXPIRATION_MS;
 
+    private static final long TEST_ACCESS_TOKEN_EXPIRATION_MS = 1000L * 60 * 60 * 24 * 30; // 30일
+
     @Autowired
     public JwtTokenServiceImpl(Environment env) {
 
@@ -77,6 +79,25 @@ public class JwtTokenServiceImpl implements JwtTokenService {
         return Jwts.builder()
                 .subject(customUserDetails.getUsername())
                 .expiration(new Date(now + REFRESH_TOKEN_EXPIRATION_MS))
+                .signWith(key)
+                .compact();
+    }
+
+    // 테스트용 accessToken
+    @Override
+    public String generateTestAccessToken(CustomUserDetails customUserDetails) {
+        String authorities = customUserDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        Date accessTokenExpiresIn = new Date(now + TEST_ACCESS_TOKEN_EXPIRATION_MS);
+
+        return Jwts.builder()
+                .subject(customUserDetails.getUsername())
+                .claim("roles", authorities)
+                .claim("userId", customUserDetails.getId())
+                .expiration(accessTokenExpiresIn)
                 .signWith(key)
                 .compact();
     }
