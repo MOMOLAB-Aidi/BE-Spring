@@ -27,18 +27,23 @@ public class UserCommandServiceImpl implements UserCommandService {
         if (user.getStatus() == UserStatus.INACTIVE)
             throw new UserHandler(ErrorStatus.USER_STATUS_INACTIVE);
 
-        // 비밀번호 확인 불일치 예외 처리
-        if (!request.getPassword().equals(request.getPasswordCheck())) {
+        // 1. 현재 비밀번호 일치 여부 확인
+        if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            throw new UserHandler(ErrorStatus.INVALID_CURRENT_PASSWORD);
+        }
+
+        // 2. 새 비밀번호 / 새 비밀번호 확인 일치 여부
+        if (!request.getNewPassword().equals(request.getNewPasswordCheck())) {
             throw new UserHandler(ErrorStatus.PASSWORD_NOT_MATCH);
         }
 
-        // 비밀번호 변경사항 없을 때 예외 처리
-        String rawPassword = request.getPassword();
-        if (passwordEncoder.matches(rawPassword, user.getPassword())) {
+        // 3. 새 비밀번호가 기존 비밀번호와 동일한지 검사
+        String newRawPassword = request.getNewPassword();
+        if (passwordEncoder.matches(newRawPassword, user.getPassword())) {
             throw new UserHandler(ErrorStatus.PASSWORD_UPDATE_NO_CHANGE);
         }
 
-        String hashedPassword = passwordEncoder.encode(request.getPassword());
+        String hashedPassword = passwordEncoder.encode(newRawPassword);
         user.encodePassword(hashedPassword); //사용자 비밀번호 변경
     }
 }
