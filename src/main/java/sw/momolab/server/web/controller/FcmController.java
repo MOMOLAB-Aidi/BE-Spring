@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
@@ -24,13 +25,13 @@ public class FcmController {
     @Operation(summary = "FCM 토큰 등록", description = "로그인한 사용자의 FCM 토큰을 서버에 등록합니다.")
     public ResponseEntity<Void> registerToken(@AuthenticationPrincipal(expression = "id") Long userId, @RequestBody @Valid FcmRequestDTO.FcmTokenRequestDTO request) {
         fcmTokenService.registerToken(userId, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PatchMapping("/token")
     @Operation(summary = "FCM 토큰 비활성화", description = "클라이언트 로그아웃 시 사용자의 FCM 토큰을 비활성화합니다.")
     public ResponseEntity<Void> deactivateToken(@AuthenticationPrincipal(expression = "id") Long userId, @RequestBody @Valid FcmRequestDTO.FcmTokenRequestDTO request) {
         fcmTokenService.deactivateToken(userId, request);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 }

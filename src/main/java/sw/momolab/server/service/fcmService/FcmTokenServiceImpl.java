@@ -37,6 +37,11 @@ public class FcmTokenServiceImpl implements FcmTokenService {
                         .build()
                 );
 
+        // 기존 토큰이 다른 사용자의 것인 경우 예외 처리
+        if (!fcmToken.getUser().getId().equals(userId)) {
+            throw new SecurityException("다른 사용자의 토큰은 등록할 수 없습니다.");
+        }
+
         fcmToken.activate();
         fcmTokenRepository.save(fcmToken);
     }

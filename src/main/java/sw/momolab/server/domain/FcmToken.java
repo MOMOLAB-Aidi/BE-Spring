@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Table(name = "fcm_token")
 @Entity
@@ -36,6 +37,11 @@ public class FcmToken {
         if (!(o instanceof FcmToken)) return false;
         FcmToken fcmToken = (FcmToken) o;
         return token != null && token.equals(fcmToken.token);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(token);
     }
 
     public void activate() {
