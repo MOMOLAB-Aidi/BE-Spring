@@ -25,7 +25,7 @@ public class FcmToken {
     private LocalDateTime lastActivatedAt;
 
     @Column(nullable = false)
-    private Boolean isActive;
+    private boolean isActive;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)

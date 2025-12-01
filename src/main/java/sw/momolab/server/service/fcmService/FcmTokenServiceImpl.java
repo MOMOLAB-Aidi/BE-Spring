@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sw.momolab.server.apiPayload.code.status.ErrorStatus;
+import sw.momolab.server.apiPayload.exception.TokenHandler;
 import sw.momolab.server.apiPayload.exception.UserHandler;
 import sw.momolab.server.domain.FcmToken;
 import sw.momolab.server.domain.User;
@@ -39,7 +40,7 @@ public class FcmTokenServiceImpl implements FcmTokenService {
 
         // 기존 토큰이 다른 사용자의 것인 경우 예외 처리
         if (!fcmToken.getUser().getId().equals(userId)) {
-            throw new SecurityException("다른 사용자의 토큰은 등록할 수 없습니다.");
+            throw new TokenHandler(ErrorStatus.FCM_TOKEN_OTHER_USER);
         }
 
         fcmToken.activate();
@@ -51,10 +52,10 @@ public class FcmTokenServiceImpl implements FcmTokenService {
     public void deactivateToken(Long userId, FcmRequestDTO.FcmTokenRequestDTO request) {
         String token = request.getFcmToken();
         FcmToken fcmToken = fcmTokenRepository.findByToken(token)
-                .orElseThrow(() -> new IllegalArgumentException("토큰을 찾을 수 없습니다."));
+                .orElseThrow(() -> new TokenHandler(ErrorStatus.FCM_TOKEN_NOT_FOUND));
 
         if (!fcmToken.getUser().getId().equals(userId)) {
-            throw new SecurityException("본인의 토큰만 비활성화할 수 있습니다.");
+            throw new TokenHandler(ErrorStatus.FCM_TOKEN_NOT_OWNED_BY_USER);
         }
 
        fcmToken.deactivate();

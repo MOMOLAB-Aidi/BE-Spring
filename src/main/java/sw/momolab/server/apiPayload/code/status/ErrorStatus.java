@@ -22,6 +22,10 @@ public enum ErrorStatus implements BaseErrorCode {
     TOKEN_GENERAL_ERROR(HttpStatus.UNAUTHORIZED, "AUTH_401_04", "기타 토큰 인증 오류입니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "AUTH_401_05", "인증 정보가 필요합니다."),
 
+    FCM_TOKEN_OTHER_USER(HttpStatus.FORBIDDEN, "FCM_403_01", "다른 사용자의 FCM 토큰은 등록할 수 없습니다."),
+    FCM_TOKEN_NOT_OWNED_BY_USER(HttpStatus.FORBIDDEN, "FCM403_02", "본인의 FCM 토큰만 비활성화할 수 있습니다."),
+    FCM_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "FCM404_01", "FCM 토큰을 찾을 수 없습니다."),
+
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "AUTH_401_06", "유효하지 않은 Refresh Token입니다."),
 
     USER_STATUS_INACTIVE(HttpStatus.FORBIDDEN, "USER_403_01", "탈퇴한 사용자입니다."),
