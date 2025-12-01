@@ -16,7 +16,7 @@ public class FcmRequestDTO {
     @Schema(title = "FCM 토큰 등록 요청 dto")
     public static class FcmTokenRequestDTO {
         @NotBlank(message = "FCM 토큰은 비어 있을 수 없습니다.")
-        @Schema(description = "디바이스에서 발급받은 FCM 토큰")
+        @Schema(description = "디바이스에서 발급받은 FCM 토큰", example = "eJz9YzKpSytGQ3S3pV3Kq...")
         private String fcmToken;
     }
 }
