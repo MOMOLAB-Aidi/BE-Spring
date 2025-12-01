@@ -29,7 +29,7 @@ public enum ErrorStatus implements BaseErrorCode {
 
     PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "PWD_400_01", "비밀번호 확인이 일치하지 않습니다."),
     PASSWORD_UPDATE_NO_CHANGE(HttpStatus.BAD_REQUEST, "PWD_400_02", "새로운 비밀번호를 입력해주세요."),
-
+    INVALID_CURRENT_PASSWORD(HttpStatus.BAD_REQUEST, "PWD_400_03", "현재 비밀번호가 일치하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;

@@ -16,13 +16,17 @@ public class UserRequestDTO {
     @Schema(title = "비밀번호 재설정 요청 dto")
     public static class ResetPasswordDTO {
 
+        @Schema(description = "현재 비밀번호 입력", example = "aidi2024")
+        @NotBlank(message = "현재 비밀번호는 필수 입력 항목입니다.")
+        private String currentPassword;
+
         @Schema(description = "변경하려는 비밀번호 입력", example = "aidi2025")
         @NotBlank(message = "비밀번호는 필수 입력 항목입니다.")
         @Pattern(regexp = "^(?=.*\\d).{8,30}$", message = "비밀번호는 8~30자 이내이며, 최소 1개의 숫자를 포함해야 합니다.")
-        private String password;
+        private String newPassword;
 
         @Schema(description = "변경하려는 비밀번호 재입력", example = "aidi2025")
         @NotBlank(message = "비밀번호 확인은 필수 입력 항목입니다.")
-        private String passwordCheck;
+        private String newPasswordCheck;
     }
 }
