@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class Scheduler {
+public class ConsultLogScheduler {
 
     private final ConsultLogRepository consultLogRepository;
 
