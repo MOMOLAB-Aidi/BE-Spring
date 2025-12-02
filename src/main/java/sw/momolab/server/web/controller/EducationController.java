@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import sw.momolab.server.domain.Education;
 import sw.momolab.server.service.educationService.EducationService;
 import sw.momolab.server.web.dto.EducationDTO.EducationResponseDTO;
 
@@ -22,12 +21,7 @@ public class EducationController {
     @GetMapping("/today-tip")
     @Operation(summary = "오늘의 복막투석 TIP 추출 API", description = "education 테이블에서 복막투석 관리 TIP을 랜덤으로 1개 추출합니다.")
     public ResponseEntity<EducationResponseDTO.TipResponseDTO> getTodayTip() {
-        Education education = educationService.getRandomTip();
-        EducationResponseDTO.TipResponseDTO response = new EducationResponseDTO.TipResponseDTO(
-                education.getId(),
-                "오늘의 복막투석 관리 TIP",
-                education.getMessageKo()
-        );
+        EducationResponseDTO.TipResponseDTO response = educationService.getRandomTip();
         return ResponseEntity.ok(response);
     }
 }

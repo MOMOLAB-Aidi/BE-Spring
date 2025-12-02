@@ -1,7 +1,7 @@
 package sw.momolab.server.service.educationService;
 
-import sw.momolab.server.domain.Education;
+import sw.momolab.server.web.dto.EducationDTO.EducationResponseDTO;
 
 public interface EducationService {
-    Education getRandomTip();
+    EducationResponseDTO.TipResponseDTO getRandomTip();
 }

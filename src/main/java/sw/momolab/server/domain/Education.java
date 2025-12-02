@@ -18,7 +18,7 @@ public class Education {
     @Column(nullable = false, columnDefinition = "text")
     private String messageKo;
 
-    @Column(nullable = false)
-    private Boolean isActive = true;
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean isActive;
 }
 
