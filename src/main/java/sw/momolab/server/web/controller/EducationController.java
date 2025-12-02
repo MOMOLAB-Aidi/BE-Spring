@@ -24,9 +24,9 @@ public class EducationController {
     public ResponseEntity<EducationResponseDTO.TipResponseDTO> getTodayTip() {
         Education education = educationService.getRandomTip();
         EducationResponseDTO.TipResponseDTO response = new EducationResponseDTO.TipResponseDTO(
+                education.getId(),
                 "오늘의 복막투석 관리 TIP",
-                education.getMessageKo(),
-                education.getId()
+                education.getMessageKo()
         );
         return ResponseEntity.ok(response);
     }
