@@ -36,4 +36,11 @@ public class UserController {
         userCommandService.updatePassword(userId, request);
         return ApiResponse.onSuccess();
     }
+
+    @GetMapping("/hospital")
+    @Operation(summary = "자주 가는 병원 조회 API", description = "환자가 자주 가는 병원을 조회합니다.")
+    public ApiResponse<UserResponseDTO.HospitalInfoDTO> getHospitalInfo(@AuthenticationPrincipal(expression = "id") Long userId) {
+        UserResponseDTO.HospitalInfoDTO response = userQueryService.getHospitalInfo(userId);
+        return ApiResponse.onSuccess(response);
+    }
 }

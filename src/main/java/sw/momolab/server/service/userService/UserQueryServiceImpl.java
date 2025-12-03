@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sw.momolab.server.apiPayload.code.status.ErrorStatus;
+import sw.momolab.server.apiPayload.exception.HospitalHandler;
 import sw.momolab.server.apiPayload.exception.UserHandler;
 import sw.momolab.server.converter.UserConverter;
+import sw.momolab.server.domain.Hospital;
 import sw.momolab.server.domain.User;
 import sw.momolab.server.repository.RecordRepository;
 import sw.momolab.server.repository.UserRepository;
@@ -45,5 +47,18 @@ public class UserQueryServiceImpl implements UserQueryService {
         }
 
         return UserConverter.toMyPageDTO(user, firstRecordDate, dPlusPeriod);
+    }
+
+    @Override
+    public UserResponseDTO.HospitalInfoDTO getHospitalInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+
+        Hospital hospital = user.getHospital();
+        if (hospital == null) {
+            throw new HospitalHandler(ErrorStatus.HOSPITAL_NOT_FOUND);
+        }
+
+        return UserConverter.toHospitalDTO(hospital);
     }
 }
