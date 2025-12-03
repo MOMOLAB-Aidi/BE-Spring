@@ -28,4 +28,17 @@ public class UserResponseDTO {
         @Schema(description = "마지막으로 로그인한 날짜와 시각")
         private LocalDateTime lastLoginAt;
     }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(title = "자주 가는 병원 조회 응답 dto")
+    public static class HospitalInfoDTO {
+        @Schema(description = "병원 이름", example = "전남대학교병원")
+        private String name;
+
+        @Schema(description = "응급실 번호", example = "062-220-5555")
+        private String emergencyPhone;
+    }
 }

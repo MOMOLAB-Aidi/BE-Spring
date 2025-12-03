@@ -1,5 +1,6 @@
 package sw.momolab.server.converter;
 
+import sw.momolab.server.domain.Hospital;
 import sw.momolab.server.domain.User;
 import sw.momolab.server.web.dto.UserDTO.UserResponseDTO;
 
@@ -12,6 +13,13 @@ public class UserConverter {
                 .recordStartDate(firstRecordDate)
                 .recordPeriod(dPlusPeriod)
                 .lastLoginAt(user.getLastLoginAt())
+                .build();
+    }
+
+    public static UserResponseDTO.HospitalInfoDTO toHospitalDTO(Hospital hospital) {
+        return UserResponseDTO.HospitalInfoDTO.builder()
+                .name(hospital.getName())
+                .emergencyPhone(hospital.getEmergencyPhone())
                 .build();
     }
 }
