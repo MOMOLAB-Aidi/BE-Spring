@@ -19,6 +19,7 @@ public class EducationServiceImpl implements EducationService {
     private final EducationRepository educationRepository;
 
     @Transactional(readOnly = true)
+    @Override
     public EducationResponseDTO.TipResponseDTO getRandomTip() {
         Optional<Education> tips = educationRepository.findRandomActiveTip();
         if (tips.isEmpty()) {
