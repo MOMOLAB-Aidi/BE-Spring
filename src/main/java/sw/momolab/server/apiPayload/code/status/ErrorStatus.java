@@ -37,6 +37,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
     EDUCATION_NOT_FOUND(HttpStatus.NOT_FOUND, "EDU404_01", "사용 가능한 교육 문구가 없습니다."),
 
+    HOSPITAL_NOT_FOUND(HttpStatus.NOT_FOUND, "HOS404_01", "등록된 병원이 없습니다."),
+
     ;
 
     private final HttpStatus httpStatus;

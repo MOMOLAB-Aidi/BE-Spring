@@ -55,6 +55,10 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ConsultLog> consultLogList = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hospital_id")
+    private Hospital hospital;
+
     public void updateLastLoginAt(LocalDateTime now) {
         this.lastLoginAt = now;
     }
