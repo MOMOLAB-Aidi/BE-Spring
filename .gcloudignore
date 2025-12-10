@@ -1,0 +1,14 @@
+.git
+.gitignore
+**/.git/**
+**/.gitignore
+
+# Gradle 캐시, 빌드 결과물
+.gradle
+build
+out
+
+# IDE 관련
+.idea
+.vscode
+*.iml
